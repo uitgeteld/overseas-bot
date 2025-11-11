@@ -1,7 +1,7 @@
 module.exports = {
     categories: {
         'util': '🔧 Utility',
-        'level': '📊 Leveling',
+        'git': ' 🐈‍⬛ Git',
     },
 
     getCategoryName(folderName) {
