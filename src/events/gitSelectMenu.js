@@ -124,7 +124,7 @@ module.exports = {
 
                     fileChanges = commitDetails.files
                         .slice(0, 10)
-                        .map(file => `📄 ${file.filename}`)
+                        .map(file => `${file.filename}`)
                         .join('\n');
                 }
 
@@ -247,7 +247,7 @@ module.exports = {
 
             if (fileChanges) {
                 embed.addFields({
-                    name: '📄 Files Changed',
+                    name: '📚 Files Changed',
                     value: `\`\`\`\n${fileChanges}\n\`\`\``,
                     inline: false
                 });
