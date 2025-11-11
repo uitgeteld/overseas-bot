@@ -1,41 +1,46 @@
-const { execSync, spawn } = require('child_process');
-const time = Date.now();
+const { execSync } = require('child_process');
+const startTime = Date.now();
+
+try {
+    console.log('Checking for updates...');
+    execSync('git fetch origin main', { stdio: 'pipe' });
+    
+    const changes = execSync('git log HEAD..origin/main --oneline', { encoding: 'utf-8' });
+    
+    if (changes.trim()) {
+        console.log('\nNew commits found:');
+        console.log(changes);
+        
+        const diffStat = execSync('git diff --stat HEAD..origin/main', { encoding: 'utf-8' });
+        console.log('Files changed:');
+        console.log(diffStat);
+    } else {
+        console.log('No updates available.\n');
+    }
+} catch (error) {
+    console.log(`Could not check for updates ${error}\n`);
+}
 
 try {
     console.log('Pulling latest changes from GitHub...');
     execSync('git pull origin main', { stdio: 'inherit' });
     console.log('Successfully updated from GitHub!\n');
 } catch (error) {
-    console.log(`Could not pull from GitHub ${error}`);
+    console.log(`Could not pull from GitHub ${error}\n`);
     console.log('Continuing with existing files...\n');
 }
 
 try {
     console.log('Installing dependencies...');
-    execSync('npm install', { stdio: 'inherit' });
+    execSync('npm install --production', { stdio: 'inherit' });
     console.log('Dependencies installed!\n');
 } catch (error) {
-    console.log('Error installing dependencies');
-    console.error(error.message);
+    console.log(`Error installing dependencies ${error}\n`);
 }
 
+const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);
+console.log(`Setup completed in ${setupTime}s\n`);
+
 console.log('Starting bot...');
-
-const bot = spawn('node', ['src/index.js'], { stdio: 'inherit' });
-
-bot.on('spawn', () => {
-    const timeInSeconds = ((Date.now() - time) / 1000).toFixed(1);
-    console.log(`Bot started successfully, it took ${timeInSeconds}s to start.`);
-});
-
-bot.on('error', (error) => {
-    console.error(`Error starting bot: ${error.message}`);
-});
-
-bot.on('exit', (code) => {
-    if (code !== 0) {
-        console.log(`Bot exited with code ${code}`);
-    }
-    process.exit(code);
-});
+require('./src/index.js');
 
