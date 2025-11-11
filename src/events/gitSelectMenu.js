@@ -42,7 +42,6 @@ module.exports = {
                     .setTitle(`Latest Commits - ${repo}`)
                     .setURL(`https://github.com/${repo}`)
                     .setDescription('Select a commit from the dropdown to view details')
-                    .setTimestamp();
 
                 commits.forEach(commit => {
                     embed.addFields({
@@ -134,24 +133,30 @@ module.exports = {
                 }
 
                 if (commitDetails.files && commitDetails.files.length > 0) {
+                    // Store files with their patches separately for individual display
                     codeChanges = commitDetails.files
-                        .slice(0, 3)
-                        .map(file => file.patch || '')
-                        .join('\n')
-                        .split('\n')
-                        .filter(line => {
-                            return !line.startsWith('diff --git') &&
-                                !line.startsWith('index ') &&
-                                !line.startsWith('---') &&
-                                !line.startsWith('+++') &&
-                                !line.startsWith('@@');
+                        .slice(0, 2)
+                        .map(file => {
+                            if (!file.patch) return null;
+                            
+                            const cleanPatch = file.patch
+                                .split('\n')
+                                .filter(line => {
+                                    return !line.startsWith('diff --git') &&
+                                        !line.startsWith('index ') &&
+                                        !line.startsWith('---') &&
+                                        !line.startsWith('+++') &&
+                                        !line.startsWith('@@');
+                                })
+                                .join('\n')
+                                .trim();
+                            
+                            if (cleanPatch.length > 500) {
+                                return { filename: file.filename, patch: cleanPatch.substring(0, 497) + '...' };
+                            }
+                            return { filename: file.filename, patch: cleanPatch };
                         })
-                        .join('\n')
-                        .trim();
-
-                    if (codeChanges.length > 1000) {
-                        codeChanges = codeChanges.substring(0, 997) + '...';
-                    }
+                        .filter(f => f !== null);
                 }
 
             } else {
@@ -186,21 +191,38 @@ module.exports = {
 
                 const diff = execSync(`git diff ${hash}~1 ${hash}`, { encoding: 'utf-8' });
 
-                codeChanges = diff
-                    .split('\n')
-                    .filter(line => {
-                        return !line.startsWith('diff --git') &&
-                            !line.startsWith('index ') &&
-                            !line.startsWith('---') &&
-                            !line.startsWith('+++') &&
-                            !line.startsWith('@@');
-                    })
-                    .join('\n')
-                    .trim();
+                // Parse diff into separate files
+                const fileDiffs = [];
+                let currentFile = null;
+                let currentPatch = [];
 
-                if (codeChanges.length > 1000) {
-                    codeChanges = codeChanges.substring(0, 997) + '...';
+                diff.split('\n').forEach(line => {
+                    if (line.startsWith('diff --git')) {
+                        if (currentFile && currentPatch.length > 0) {
+                            fileDiffs.push({ filename: currentFile, patch: currentPatch.join('\n') });
+                        }
+                        const match = line.match(/diff --git a\/(.+) b\//);
+                        currentFile = match ? match[1] : null;
+                        currentPatch = [];
+                    } else if (!line.startsWith('index ') && !line.startsWith('---') && !line.startsWith('+++') && !line.startsWith('@@')) {
+                        currentPatch.push(line);
+                    }
+                });
+
+                if (currentFile && currentPatch.length > 0) {
+                    fileDiffs.push({ filename: currentFile, patch: currentPatch.join('\n') });
                 }
+
+                codeChanges = fileDiffs
+                    .slice(0, 2)
+                    .map(file => {
+                        const cleanPatch = file.patch.trim();
+                        if (cleanPatch.length > 500) {
+                            return { filename: file.filename, patch: cleanPatch.substring(0, 497) + '...' };
+                        }
+                        return { filename: file.filename, patch: cleanPatch };
+                    })
+                    .filter(f => f.patch);
             }
 
             const embed = new EmbedBuilder()
@@ -213,7 +235,7 @@ module.exports = {
                     { name: 'Date', value: date, inline: true },
                     { name: 'Hash', value: `\`${shortHash}\``, inline: true }
                 )
-                .setTimestamp();
+                .setTimestamp(date);
 
             console.log(`Embed URL: ${repo ? `https://github.com/${repo}/commit/${hash}` : 'undefined'}`);
 
@@ -234,11 +256,38 @@ module.exports = {
                 });
             }
 
-            if (codeChanges && codeChanges !== 'No code changes found') {
-                embed.addFields({
-                    name: 'Code Changes',
-                    value: `\`\`\`diff\n${codeChanges}\n\`\`\``,
-                    inline: false
+            if (codeChanges && Array.isArray(codeChanges) && codeChanges.length > 0) {
+                codeChanges.forEach(file => {
+                    const ext = file.filename.split('.').pop().toLowerCase();
+                    const langMap = {
+                        'js': 'javascript',
+                        'ts': 'typescript',
+                        'py': 'python',
+                        'java': 'java',
+                        'cpp': 'cpp',
+                        'c': 'c',
+                        'cs': 'csharp',
+                        'rb': 'ruby',
+                        'go': 'go',
+                        'rs': 'rust',
+                        'php': 'php',
+                        'html': 'html',
+                        'css': 'css',
+                        'json': 'json',
+                        'xml': 'xml',
+                        'yml': 'yaml',
+                        'yaml': 'yaml',
+                        'md': 'markdown',
+                        'sh': 'bash',
+                        'sql': 'sql'
+                    };
+                    const lang = langMap[ext] || 'diff';
+                    
+                    embed.addFields({
+                        name: `📄 ${file.filename}`,
+                        value: `\`\`\`${lang}\n${file.patch}\n\`\`\``,
+                        inline: false
+                    });
                 });
             }
 
