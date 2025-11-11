@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } = require('discord.js');
 const { execSync } = require('child_process');
+const githubFetch = require('../../functions/githubFetch');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -39,7 +40,7 @@ module.exports = {
                 console.log(`Git command - repo: ${repo}, owner: ${owner}, repoName: ${repoName}`);
                 
                 if (!repoName) {
-                    const userResponse = await fetch(`https://api.github.com/users/${owner}`);
+                    const userResponse = await githubFetch(`https://api.github.com/users/${owner}`);
                     
                     if (!userResponse.ok) {
                         return await interaction.reply({ 
@@ -50,7 +51,7 @@ module.exports = {
 
                     const userData = await userResponse.json();
 
-                    const reposResponse = await fetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=25`);
+                    const reposResponse = await githubFetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=25`);
                     const repos = await reposResponse.json();
 
                     const embed = new EmbedBuilder()
@@ -89,7 +90,7 @@ module.exports = {
                     }
                 }
 
-                const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
+                const response = await githubFetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
                 
                 console.log(`GitHub API response status: ${response.status}`);
                 
