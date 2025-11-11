@@ -58,9 +58,9 @@ module.exports = {
                         .setThumbnail(userData.avatar_url)
                         .setDescription(userData.bio || 'No bio available')
                         .addFields(
-                            { name: '📍 Location', value: userData.location || 'Not specified', inline: true },
                             { name: '📊 Public Repos', value: userData.public_repos.toString(), inline: true },
-                            { name: '👥 Followers', value: userData.followers.toString(), inline: true }
+                            { name: '👥 Followers', value: userData.followers.toString(), inline: true },
+                            { name: '⭐ Following', value: userData.following.toString(), inline: true }
                         )
                         .setTimestamp();
 
@@ -127,6 +127,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
+                .setURL(repo ? `https://github.com/${owner}/${repo}` : undefined)
                 .setDescription('Select a commit from the dropdown to view details')
                 .setTimestamp();
 
