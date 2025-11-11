@@ -115,7 +115,15 @@ module.exports = {
                 const commitResponse = await githubFetch(`https://api.github.com/repos/${owner}/${repoName}/commits/${hash}`);
                 const commitDetails = await commitResponse.json();
 
+                let totalAdditions = 0;
+                let totalDeletions = 0;
+
                 if (commitDetails.files && commitDetails.files.length > 0) {
+                    commitDetails.files.forEach(file => {
+                        totalAdditions += file.additions || 0;
+                        totalDeletions += file.deletions || 0;
+                    });
+
                     fileChanges = commitDetails.files
                         .slice(0, 10)
                         .map(file => {
@@ -158,7 +166,17 @@ module.exports = {
 
                 [hash, shortHash, author, date, message] = commitLine.split('|');
 
-                [hash, shortHash, author, date, message] = commitLine.split('|');
+                const numstat = execSync(`git show ${hash} --numstat --format=""`, { encoding: 'utf-8' });
+                let totalAdditions = 0;
+                let totalDeletions = 0;
+
+                numstat.trim().split('\n').forEach(line => {
+                    if (line.trim()) {
+                        const parts = line.split('\t');
+                        totalAdditions += parseInt(parts[0]) || 0;
+                        totalDeletions += parseInt(parts[1]) || 0;
+                    }
+                });
 
                 const diffStat = execSync(`git show ${hash} --stat`, { encoding: 'utf-8' });
                 const diffLines = diffStat.split('\n');
@@ -201,6 +219,15 @@ module.exports = {
                 .setTimestamp();
 
             console.log(`Embed URL: ${repo ? `https://github.com/${repo}/commit/${hash}` : 'undefined'}`);
+
+            if (totalAdditions !== undefined && totalDeletions !== undefined) {
+                const changesText = `\`\`\`diff\n+ ${totalAdditions} additions\n- ${totalDeletions} deletions\n\`\`\``;
+                embed.addFields({
+                    name: '📊 Lines Changed',
+                    value: changesText,
+                    inline: false
+                });
+            }
 
             if (fileChanges) {
                 embed.addFields({
