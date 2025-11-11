@@ -10,7 +10,6 @@ module.exports = {
                 .setDescription('GitHub username or repository (username or owner/repo or URL)')
                 .setRequired(false)
         ),
-    // devOnly: true,
     async execute(interaction, client) {
         try {
             let repo = interaction.options.getString('repo');
@@ -37,9 +36,7 @@ module.exports = {
 
                 const [owner, repoName] = repo.split('/');
                 
-                // Check if it's just a username (no repo)
                 if (!repoName) {
-                    // Fetch user profile
                     const userResponse = await fetch(`https://api.github.com/users/${owner}`);
                     
                     if (!userResponse.ok) {
@@ -51,7 +48,6 @@ module.exports = {
 
                     const userData = await userResponse.json();
 
-                    // Fetch user's repositories
                     const reposResponse = await fetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=25`);
                     const repos = await reposResponse.json();
 
@@ -72,7 +68,6 @@ module.exports = {
                         embed.addFields({ name: '🔗 Website', value: userData.blog, inline: true });
                     }
 
-                    // Create dropdown for repositories
                     if (repos.length > 0) {
                         const selectMenu = new StringSelectMenuBuilder()
                             .setCustomId(`git-user-repo-select:${owner}`)
@@ -92,7 +87,6 @@ module.exports = {
                     }
                 }
 
-                // It's a full repo (owner/repoName)
                 const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
                 
                 if (!response.ok) {

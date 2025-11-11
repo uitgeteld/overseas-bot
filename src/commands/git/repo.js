@@ -10,7 +10,6 @@ module.exports = {
                 .setDescription('GitHub user or repository (username or owner/repo or URL)')
                 .setRequired(false)
         ),
-    // devOnly: true,
     async execute(interaction, client) {
         try {
             let repo = interaction.options.getString('repo');
@@ -20,30 +19,30 @@ module.exports = {
                 if (repo.includes('github.com') || repo.includes('git@github.com')) {
                     let match;
                     match = repo.match(/github\.com[\/:]([^\/]+)\/([^\/\s\.]+)/);
-                    
+
                     if (!match) {
                         match = repo.match(/git@github\.com:([^\/]+)\/([^\/\s\.]+)/);
                     }
-                    
+
                     if (match) {
                         repo = `${match[1]}/${match[2]}`;
                     } else {
-                        return await interaction.reply({ 
-                            content: 'Invalid GitHub URL format.', 
-                            flags: MessageFlags.Ephemeral 
+                        return await interaction.reply({
+                            content: 'Invalid GitHub URL format.',
+                            flags: MessageFlags.Ephemeral
                         });
                     }
                 }
 
                 const [owner, repoName] = repo.split('/');
-                
+
                 if (!repoName) {
                     const userResponse = await fetch(`https://api.github.com/users/${owner}`);
-                    
+
                     if (!userResponse.ok) {
-                        return await interaction.reply({ 
-                            content: 'Failed to fetch user from GitHub. Make sure the username exists.', 
-                            flags: MessageFlags.Ephemeral 
+                        return await interaction.reply({
+                            content: 'Failed to fetch user from GitHub. Make sure the username exists.',
+                            flags: MessageFlags.Ephemeral
                         });
                     }
 
@@ -73,7 +72,7 @@ module.exports = {
                             .slice(0, 5)
                             .map(r => `[${r.name}](${r.html_url}) - ${r.description || 'No description'}`)
                             .join('\n');
-                        
+
                         embed.addFields({
                             name: '📦 Recent Repositories',
                             value: repoList,
@@ -85,11 +84,11 @@ module.exports = {
                 }
 
                 const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
-                
+
                 if (!response.ok) {
-                    return await interaction.reply({ 
-                        content: 'Failed to fetch commits from GitHub. Make sure the repository is public and exists.', 
-                        flags: MessageFlags.Ephemeral 
+                    return await interaction.reply({
+                        content: 'Failed to fetch commits from GitHub. Make sure the repository is public and exists.',
+                        flags: MessageFlags.Ephemeral
                     });
                 }
 
@@ -112,7 +111,7 @@ module.exports = {
                         'Accept': 'application/vnd.github.v3.raw'
                     }
                 });
-                
+
                 let readmeContent = '';
                 if (readmeResponse.ok) {
                     const readme = await readmeResponse.text();
@@ -123,7 +122,7 @@ module.exports = {
 
             } else {
                 const gitLog = execSync('git log -10 --pretty=format:"%H|%h|%an|%ar|%s"', { encoding: 'utf-8' });
-                
+
                 if (!gitLog.trim()) {
                     return await interaction.reply({ content: 'No commits found.', flags: MessageFlags.Ephemeral });
                 }
@@ -134,11 +133,11 @@ module.exports = {
                     return { id: index.toString(), hash, shortHash, author, date, message };
                 });
 
-                let readmeContent = '';
+                let readmeContent = 'No description';
                 try {
                     const fs = require('fs');
                     const path = require('path');
-                    
+
                     const readmeFiles = ['README.md', 'readme.md', 'README.MD', 'README.txt', 'README'];
                     for (const filename of readmeFiles) {
                         const readmePath = path.join(process.cwd(), filename);
@@ -155,6 +154,7 @@ module.exports = {
                     readmeContent = 'Could not read README file.';
                 }
             }
+            let readmeContent = 'No description';
 
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
@@ -194,7 +194,7 @@ module.exports = {
 function getRelativeTime(date) {
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
-    
+
     const intervals = {
         year: 31536000,
         month: 2592000,
@@ -203,7 +203,7 @@ function getRelativeTime(date) {
         hour: 3600,
         minute: 60
     };
-    
+
     for (const [unit, secondsInUnit] of Object.entries(intervals)) {
         const interval = Math.floor(seconds / secondsInUnit);
         if (interval >= 1) {
