@@ -93,6 +93,8 @@ module.exports = {
                 const repoName = interaction.values[0];
                 const repo = `${username}/${repoName}`;
 
+                console.log(`Fetching commits for: ${repo} (username: ${username}, repoName: ${repoName})`);
+
                 const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=10`);
 
                 if (!response.ok) {
