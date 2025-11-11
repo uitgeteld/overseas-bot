@@ -18,8 +18,9 @@ module.exports = {
                     const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
 
                     if (!response.ok) {
+                        console.error(`GitHub API error: ${response.status} ${response.statusText}`);
                         return await interaction.reply({
-                            content: 'Failed to fetch commits from this repository.',
+                            content: `Failed to fetch commits from this repository. (${response.status})`,
                             flags: MessageFlags.Ephemeral
                         });
                     }
@@ -95,8 +96,9 @@ module.exports = {
                 const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=10`);
 
                 if (!response.ok) {
+                    console.error(`GitHub API error for ${repo}: ${response.status} ${response.statusText}`);
                     return await interaction.reply({
-                        content: 'Failed to fetch commits from this repository.',
+                        content: `Failed to fetch commits from this repository. (${response.status})`,
                         flags: MessageFlags.Ephemeral
                     });
                 }
