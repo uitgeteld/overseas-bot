@@ -91,9 +91,11 @@ module.exports = {
 
                 const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
                 
+                console.log(`GitHub API response status: ${response.status}`);
+                
                 if (!response.ok) {
                     return await interaction.reply({ 
-                        content: 'Failed to fetch commits from GitHub. Make sure the repository is public and exists.', 
+                        content: `Failed to fetch commits from GitHub. Status: ${response.status}. Make sure the repository is public and exists.`, 
                         flags: MessageFlags.Ephemeral 
                     });
                 }
