@@ -31,7 +31,6 @@ module.exports = {
                 });
             });
 
-            // Save to JSON file in root directory
             const jsonPath = path.join(process.cwd(), 'git-commits.json');
             try {
                 fs.writeFileSync(jsonPath, JSON.stringify(commitData, null, 2));

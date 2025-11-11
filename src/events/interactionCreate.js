@@ -55,6 +55,15 @@ module.exports = {
                         .slice(0, 10)
                         .join('\n');
 
+                    const diff = execSync(`git show ${commit.hash} --no-color`, { encoding: 'utf-8' });
+                    
+                    const diffMatch = diff.match(/diff --git[\s\S]+/);
+                    let codeChanges = diffMatch ? diffMatch[0] : 'No code changes found';
+                    
+                    if (codeChanges.length > 1000) {
+                        codeChanges = codeChanges.substring(0, 997) + '...';
+                    }
+
                     const embed = new EmbedBuilder()
                         .setColor('#00ff00')
                         .setTitle(`Commit: ${commit.shortHash}`)
@@ -70,6 +79,14 @@ module.exports = {
                         embed.addFields({
                             name: 'Files Changed',
                             value: `\`\`\`\n${fileChanges}\n\`\`\``,
+                            inline: false
+                        });
+                    }
+
+                    if (codeChanges && codeChanges !== 'No code changes found') {
+                        embed.addFields({
+                            name: 'Code Changes',
+                            value: `\`\`\`diff\n${codeChanges}\n\`\`\``,
                             inline: false
                         });
                     }
