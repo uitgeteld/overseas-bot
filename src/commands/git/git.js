@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } = require('discord.js');
 const { execSync } = require('child_process');
-const githubFetch = require('../../functions/githubFetch');
+const githubFetch = require('../../helpers/githubFetch');
 
 module.exports = {
     data: new SlashCommandBuilder()
