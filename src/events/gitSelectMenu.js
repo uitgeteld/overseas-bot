@@ -257,32 +257,32 @@ module.exports = {
                 codeChanges.forEach(file => {
                     const ext = file.filename.split('.').pop().toLowerCase();
                     const langMap = {
-                        'js': 'javascript',
-                        'ts': 'typescript',
-                        'py': 'python',
-                        'java': 'java',
-                        'cpp': 'cpp',
-                        'c': 'c',
-                        'cs': 'csharp',
-                        'rb': 'ruby',
-                        'go': 'go',
-                        'rs': 'rust',
-                        'php': 'php',
-                        'html': 'html',
-                        'css': 'css',
-                        'json': 'json',
-                        'xml': 'xml',
-                        'yml': 'yaml',
-                        'yaml': 'yaml',
-                        'md': 'markdown',
-                        'sh': 'bash',
-                        'sql': 'sql'
+                        'js': 'JavaScript',
+                        'ts': 'TypeScript',
+                        'py': 'Python',
+                        'java': 'Java',
+                        'cpp': 'C++',
+                        'c': 'C',
+                        'cs': 'C#',
+                        'rb': 'Ruby',
+                        'go': 'Go',
+                        'rs': 'Rust',
+                        'php': 'PHP',
+                        'html': 'HTML',
+                        'css': 'CSS',
+                        'json': 'JSON',
+                        'xml': 'XML',
+                        'yml': 'YAML',
+                        'yaml': 'YAML',
+                        'md': 'Markdown',
+                        'sh': 'Bash',
+                        'sql': 'SQL'
                     };
-                    const lang = langMap[ext] || 'diff';
+                    const langLabel = langMap[ext] || ext.toUpperCase();
                     
                     embed.addFields({
-                        name: `📄 ${file.filename}`,
-                        value: `\`\`\`${lang}\n${file.patch}\n\`\`\``,
+                        name: `📄 ${file.filename} (${langLabel})`,
+                        value: `\`\`\`diff\n${file.patch}\n\`\`\``,
                         inline: false
                     });
                 });
