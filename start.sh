@@ -29,5 +29,5 @@ node src/index.js
 
 # Calculate startup time
 END_TIME=$(date +%s%3N)
-DURATION=$(echo "scale=1; ($END_TIME - $START_TIME) / 1000" | bc)
+DURATION=$(echo "scale=1; ($END_TIME - $START_TIME) / 100" | bc)
 echo "Bot started successfully, it took ${DURATION}s to start."
