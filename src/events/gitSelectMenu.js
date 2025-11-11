@@ -124,11 +124,7 @@ module.exports = {
 
                     fileChanges = commitDetails.files
                         .slice(0, 10)
-                        .map(file => {
-                            const additions = '+'.repeat(Math.min(file.additions, 20));
-                            const deletions = '-'.repeat(Math.min(file.deletions, 20));
-                            return `${file.filename} | ${additions}${deletions}`;
-                        })
+                        .map(file => `📄 ${file.filename}`)
                         .join('\n');
                 }
 
@@ -186,6 +182,10 @@ module.exports = {
                     .slice(5, -2)
                     .filter(line => line.trim() && line.includes('|'))
                     .slice(0, 10)
+                    .map(line => {
+                        const filename = line.split('|')[0].trim();
+                        return `📄 ${filename}`;
+                    })
                     .join('\n');
 
                 const diff = execSync(`git diff ${hash}~1 ${hash}`, { encoding: 'utf-8' });
@@ -234,7 +234,7 @@ module.exports = {
                     { name: 'Hash', value: `\`${shortHash}\``, inline: true }
                 )
                 .setTimestamp();
-            console.log(`Embed URL: ${repo ? `https://github.com/${repo}/commit/${hash}` : 'undefined'}`);
+            // console.log(`Embed URL: ${repo ? `https://github.com/${repo}/commit/${hash}` : 'undefined'}`);
 
             if (totalAdditions !== undefined && totalDeletions !== undefined) {
                 const changesText = `\`\`\`diff\n+ ${totalAdditions} additions\n- ${totalDeletions} deletions\n\`\`\``;
