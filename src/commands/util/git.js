@@ -7,7 +7,7 @@ module.exports = {
         .setDescription('View the latest Git commits and changes')
         .addStringOption(option =>
             option.setName('repo')
-                .setDescription('GitHub repository (owner/repo) - defaults to this bot')
+                .setDescription('GitHub repository (owner/repo) - defaults to uitgeteld/overseas-bot')
                 .setRequired(false)
         ),
     devOnly: true,
@@ -17,7 +17,6 @@ module.exports = {
             let commits;
 
             if (repo) {
-                // Fetch from GitHub API for any public repo
                 const [owner, repoName] = repo.split('/');
                 if (!owner || !repoName) {
                     return await interaction.reply({ 
@@ -45,12 +44,11 @@ module.exports = {
                         shortHash: commit.sha.substring(0, 7),
                         author: commit.commit.author.name,
                         date: relativeTime,
-                        message: commit.commit.message.split('\n')[0] // First line only
+                        message: commit.commit.message.split('\n')[0]
                     };
                 });
 
             } else {
-                // Use local git repository
                 const gitLog = execSync('git log -10 --pretty=format:"%H|%h|%an|%ar|%s"', { encoding: 'utf-8' });
                 
                 if (!gitLog.trim()) {
@@ -67,7 +65,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
-                .setDescription('Select a commit from the dropdown to view details')
+                .setDescription(repo ? 'Showing commits from external repository' : 'Select a commit from the dropdown to view details')
                 .setTimestamp();
 
             commits.forEach(commit => {
@@ -78,20 +76,23 @@ module.exports = {
                 });
             });
 
-            const selectMenu = new StringSelectMenuBuilder()
-                .setCustomId(repo ? `git-commit-select-${repo}` : 'git-commit-select')
-                .setPlaceholder('Select a commit to view changes')
-                .addOptions(
-                    commits.map(commit => ({
-                        label: commit.message.substring(0, 100), // Discord limit
-                        description: `${commit.shortHash} by ${commit.author}`,
-                        value: commit.id
-                    }))
-                );
+            if (!repo) {
+                const selectMenu = new StringSelectMenuBuilder()
+                    .setCustomId('git-commit-select')
+                    .setPlaceholder('Select a commit to view changes')
+                    .addOptions(
+                        commits.map(commit => ({
+                            label: commit.message.substring(0, 100),
+                            description: `${commit.shortHash} by ${commit.author}`,
+                            value: commit.id
+                        }))
+                    );
 
-            const row = new ActionRowBuilder().addComponents(selectMenu);
-
-            await interaction.reply({ embeds: [embed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(selectMenu);
+                await interaction.reply({ embeds: [embed], components: [row] });
+            } else {
+                await interaction.reply({ embeds: [embed] });
+            }
 
         } catch (error) {
             console.error(error);
@@ -100,7 +101,6 @@ module.exports = {
     },
 };
 
-// Helper function to get relative time
 function getRelativeTime(date) {
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
