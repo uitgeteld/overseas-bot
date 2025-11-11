@@ -124,10 +124,26 @@ module.exports = {
                 });
             }
 
+            let embedUrl = undefined;
+            if (repo) {
+                embedUrl = `https://github.com/${repo}`;
+            } else {
+                try {
+                    const remoteUrl = execSync('git config --get remote.origin.url', { encoding: 'utf-8' }).trim();
+                    if (remoteUrl.includes('github.com')) {
+                        let match = remoteUrl.match(/github\.com[\/:](.+)\/(.+?)(\.git)?$/);
+                        if (match) {
+                            embedUrl = `https://github.com/${match[1]}/${match[2]}`;
+                        }
+                    }
+                } catch (error) {
+                }
+            }
+
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
-                .setURL(repo ? `https://github.com/${repo}` : undefined)
+                .setURL(embedUrl)
                 .setDescription('Select a commit from the dropdown to view details')
                 .setTimestamp();
 
