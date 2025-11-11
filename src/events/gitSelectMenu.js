@@ -1,5 +1,6 @@
 const { EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 const { execSync } = require('child_process');
+const githubFetch = require('../helpers/githubFetchHelper');
 
 module.exports = {
     name: 'interactionCreate',
@@ -13,7 +14,7 @@ module.exports = {
                 const repoName = interaction.values[0];
                 const repo = `${username}/${repoName}`;
 
-                const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=10`);
+                const response = await githubFetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=10`);
 
                 if (!response.ok) {
                     return await interaction.reply({
@@ -86,7 +87,7 @@ module.exports = {
 
             if (repo) {
                 const [owner, repoName] = repo.split('/');
-                const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
+                const response = await githubFetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
 
                 if (!response.ok) {
                     return await interaction.reply({ content: 'Failed to fetch commit from GitHub.', flags: MessageFlags.Ephemeral });
@@ -106,7 +107,7 @@ module.exports = {
                 date = getRelativeTime(commitDate);
                 message = commit.commit.message.split('\n')[0];
 
-                const commitResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits/${hash}`);
+                const commitResponse = await githubFetch(`https://api.github.com/repos/${owner}/${repoName}/commits/${hash}`);
                 const commitDetails = await commitResponse.json();
 
                 if (commitDetails.files && commitDetails.files.length > 0) {
