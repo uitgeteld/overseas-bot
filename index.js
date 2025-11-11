@@ -22,7 +22,8 @@ console.log('Starting bot...');
 
 try {
     require('./src/index.js');
-    console.log(`Bot started successfully, it took ${Date.now() - time}ms to start.`);
+    const timeInSeconds = ((Date.now() - time) / 1000).toFixed(1);
+    console.log(`Bot started successfully, it took ${timeInSeconds}s to start.`);
 } catch (error) {
     console.error(`Error starting bot: ${error.message}`);
 }
