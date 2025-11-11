@@ -55,10 +55,23 @@ module.exports = {
                         .slice(0, 10)
                         .join('\n');
 
-                    const diff = execSync(`git show ${commit.hash} --no-color`, { encoding: 'utf-8' });
+                    const diff = execSync(`git diff ${commit.hash}~1 ${commit.hash}`, { encoding: 'utf-8' });
                     
-                    const diffMatch = diff.match(/diff --git[\s\S]+/);
-                    let codeChanges = diffMatch ? diffMatch[0] : 'No code changes found';
+                    let codeChanges = diff
+                        .split('\n')
+                        .filter(line => {
+                            return !line.startsWith('diff --git') && 
+                                   !line.startsWith('index ') && 
+                                   !line.startsWith('---') && 
+                                   !line.startsWith('+++') &&
+                                   !line.startsWith('@@');
+                        })
+                        .join('\n')
+                        .trim();
+                    
+                    if (!codeChanges) {
+                        codeChanges = 'No code changes found';
+                    }
                     
                     if (codeChanges.length > 1000) {
                         codeChanges = codeChanges.substring(0, 997) + '...';
