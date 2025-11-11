@@ -1,5 +1,5 @@
 const { execSync } = require('child_process');
-
+const time = Date.now();
 try {
     console.log('Pulling latest changes from GitHub...');
     execSync('git pull origin main', { stdio: 'inherit' });
@@ -19,4 +19,12 @@ try {
 }
 
 console.log('Starting bot...');
-require('./src/index.js');
+
+try {
+    require('./src/index.js').then(() => {
+        console.log(`Bot started successfully, it took ${Date.now() - time}ms to start.`);
+    });
+} catch (error) {
+    console.error(`Error starting bot: ${error.message}`);
+}
+
