@@ -81,7 +81,7 @@ module.exports = {
         try {
             const selectedId = interaction.values[0];
             let repo;
-            
+
             if (interaction.customId.includes(':')) {
                 repo = interaction.customId.substring('git-commit-select:'.length);
             }
@@ -89,6 +89,8 @@ module.exports = {
             console.log(`Commit details - customId: ${interaction.customId}, repo:`, repo);
 
             let hash, shortHash, author, date, message, fileChanges, codeChanges;
+            let totalAdditions = 0;
+            let totalDeletions = 0;
 
             if (repo) {
                 const [owner, repoName] = repo.split('/');
@@ -114,9 +116,6 @@ module.exports = {
 
                 const commitResponse = await githubFetch(`https://api.github.com/repos/${owner}/${repoName}/commits/${hash}`);
                 const commitDetails = await commitResponse.json();
-
-                let totalAdditions = 0;
-                let totalDeletions = 0;
 
                 if (commitDetails.files && commitDetails.files.length > 0) {
                     commitDetails.files.forEach(file => {
@@ -167,8 +166,6 @@ module.exports = {
                 [hash, shortHash, author, date, message] = commitLine.split('|');
 
                 const numstat = execSync(`git show ${hash} --numstat --format=""`, { encoding: 'utf-8' });
-                let totalAdditions = 0;
-                let totalDeletions = 0;
 
                 numstat.trim().split('\n').forEach(line => {
                     if (line.trim()) {
