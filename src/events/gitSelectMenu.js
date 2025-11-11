@@ -63,7 +63,7 @@ module.exports = {
                 });
 
                 const selectMenu = new StringSelectMenuBuilder()
-                    .setCustomId(`git-commit-select:${repo}`)
+                    .setCustomId(repo ? `git-commit-select:${repo}` : 'git-commit-select')
                     .setPlaceholder('Select a commit to view changes')
                     .addOptions(
                         commits.map(commit => ({
@@ -162,9 +162,13 @@ module.exports = {
 
         try {
             const selectedId = interaction.values[0];
-            const repo = interaction.customId.substring('git-commit-select:'.length);
+            let repo = '';
+            
+            if (interaction.customId.includes(':')) {
+                repo = interaction.customId.substring('git-commit-select:'.length);
+            }
 
-            console.log(`Commit select - customId: ${interaction.customId}, repo: ${repo}`);
+            console.log(`Commit select - customId: ${interaction.customId}, repo: '${repo}'`);
 
             let hash, shortHash, author, date, message, fileChanges, codeChanges;
 
