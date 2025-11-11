@@ -162,8 +162,7 @@ module.exports = {
 
         try {
             const selectedId = interaction.values[0];
-            const customIdParts = interaction.customId.split(':');
-            const repo = customIdParts[1];
+            const repo = interaction.customId.substring('git-commit-select:'.length);
 
             console.log(`Commit select - customId: ${interaction.customId}, repo: ${repo}`);
 
