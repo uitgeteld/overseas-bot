@@ -5,7 +5,8 @@ module.exports = {
         .setName('ping')
         .setDescription('Replies with Pong and latency information'),
     async execute(interaction, client) {
-        const apiPing = Math.round(client.ws.ping);
-        await interaction.reply(`Pong! 🏓 API: ${apiPing}ms`);
+        const start = Date.now();
+        await interaction.reply({ content: 'Pinging... 🏓', fetchReply: true });
+        await interaction.editReply(`Pong! 🏓 Latency: ${Date.now() - start}ms. API: ${client.ws.ping}ms`);
     },
 };
