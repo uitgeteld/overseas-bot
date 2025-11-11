@@ -80,8 +80,11 @@ module.exports = {
 
         try {
             const selectedId = interaction.values[0];
-            const customIdParts = interaction.customId.split(':');
-            const repo = customIdParts[1] !== 'undefined' ? customIdParts[1] : undefined;
+            let repo;
+            
+            if (interaction.customId.includes(':')) {
+                repo = interaction.customId.substring('git-commit-select:'.length);
+            }
 
             console.log(`Commit details - customId: ${interaction.customId}, repo: '${repo}'`);
 
