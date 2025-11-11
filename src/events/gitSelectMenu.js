@@ -83,6 +83,8 @@ module.exports = {
             const customIdParts = interaction.customId.split(':');
             const repo = customIdParts[1];
 
+            console.log(`Commit details - customId: ${interaction.customId}, repo: '${repo}'`);
+
             let hash, shortHash, author, date, message, fileChanges, codeChanges;
 
             if (repo) {
