@@ -10,7 +10,7 @@ module.exports = {
                 .setDescription('GitHub repository (owner/repo or URL) - defaults to uitgeteld/overseas-bot')
                 .setRequired(false)
         ),
-    devOnly: true,
+    // devOnly: true,
     async execute(interaction, client) {
         try {
             let repo = interaction.options.getString('repo');
