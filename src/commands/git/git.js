@@ -81,9 +81,9 @@ module.exports = {
                             );
 
                         const row = new ActionRowBuilder().addComponents(selectMenu);
-                        return await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
+                        return await interaction.reply({ embeds: [embed], components: [row]});
                     } else {
-                        return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                        return await interaction.reply({ embeds: [embed] });
                     }
                 }
 
@@ -167,7 +167,7 @@ module.exports = {
                 );
 
             const row = new ActionRowBuilder().addComponents(selectMenu);
-            await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
+            await interaction.reply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error(error);

@@ -87,7 +87,7 @@ module.exports = {
                     }
 
                     embed.setTimestamp();
-                    return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                    return await interaction.reply({ embeds: [embed] });
                 }
 
                 const readmeResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
@@ -112,7 +112,7 @@ module.exports = {
                     .setDescription(readmeContent)
                     .setTimestamp();
 
-                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                await interaction.reply({ embeds: [embed] });
 
             } else {
                 let readmeContent = 'No README found in the repository.';
@@ -140,7 +140,7 @@ module.exports = {
                     .setDescription(readmeContent)
                     .setTimestamp();
 
-                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                await interaction.reply({ embeds: [embed] });
             }
 
         } catch (error) {
