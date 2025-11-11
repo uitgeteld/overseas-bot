@@ -40,7 +40,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setColor('#0099ff')
                     .setTitle(`Latest Commits - ${repo}`)
-                    .setURL(repo ? `https://github.com/${owner}/${repo}` : undefined)
+                    .setURL(`https://github.com/${repo}`)
                     .setDescription('Select a commit from the dropdown to view details')
                     .setTimestamp();
 
@@ -186,7 +186,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#00ff00')
                 .setTitle(`Commit: ${shortHash}`)
-                .setURL(`https://github.com/${repo}/commit/${hash}`)
+                .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
                 .setDescription(`**${message}**`)
                 .addFields(
                     { name: 'Author', value: author, inline: true },
