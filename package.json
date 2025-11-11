@@ -18,7 +18,7 @@
   "license": "Apache-2.0",
   "author": "uitgeteld",
   "type": "commonjs",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "prestart": "git pull origin main",
     "start": "node src/index.js",
