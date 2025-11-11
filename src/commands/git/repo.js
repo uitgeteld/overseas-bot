@@ -34,45 +34,62 @@ module.exports = {
 
                 const [owner, repoName] = repo.split('/');
 
-                // If only username provided, get user's profile README
                 if (!repoName) {
-                    // Try to fetch user's profile README (username/username repository)
-                    const readmeResponse = await fetch(`https://api.github.com/repos/${owner}/${owner}/readme`, {
-                        headers: {
-                            'Accept': 'application/vnd.github.v3.raw'
-                        }
-                    });
-
-                    let readmeContent = '';
-                    if (readmeResponse.ok) {
-                        const readme = await readmeResponse.text();
-                        readmeContent = readme.length > 4000 ? readme.substring(0, 3997) + '...' : readme;
-                    } else {
-                        // If no profile README, fetch user info
-                        const userResponse = await fetch(`https://api.github.com/users/${owner}`);
-                        
-                        if (!userResponse.ok) {
-                            return await interaction.reply({
-                                content: 'User not found and no profile README available.',
-                                flags: MessageFlags.Ephemeral
-                            });
-                        }
-
-                        const userData = await userResponse.json();
-                        readmeContent = userData.bio || 'No bio or profile README available for this user.';
+                    const userResponse = await fetch(`https://api.github.com/users/${owner}`);
+                    
+                    if (!userResponse.ok) {
+                        return await interaction.reply({
+                            content: 'User not found.',
+                            flags: MessageFlags.Ephemeral
+                        });
                     }
+
+                    const userData = await userResponse.json();
+
+                    const reposResponse = await fetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=30`);
+                    const repos = await reposResponse.json();
 
                     const embed = new EmbedBuilder()
                         .setColor('#0099ff')
-                        .setTitle(`👤 ${owner}`)
+                        .setTitle(`👤 ${userData.name || userData.login}`)
                         .setURL(`https://github.com/${owner}`)
-                        .setDescription(readmeContent)
-                        .setTimestamp();
+                        .setThumbnail(userData.avatar_url)
+                        .setDescription(userData.bio || 'No bio available');
 
+                    const fields = [];
+                    if (userData.location) fields.push({ name: '📍 Location', value: userData.location, inline: true });
+                    if (userData.company) fields.push({ name: '🏢 Company', value: userData.company, inline: true });
+                    if (userData.blog) fields.push({ name: '🔗 Website', value: userData.blog, inline: true });
+                    fields.push({ name: '📊 Repos', value: userData.public_repos.toString(), inline: true });
+                    fields.push({ name: '👥 Followers', value: userData.followers.toString(), inline: true });
+                    fields.push({ name: '⭐ Following', value: userData.following.toString(), inline: true });
+
+                    if (fields.length > 0) {
+                        embed.addFields(fields);
+                    }
+
+                    if (repos.length > 0) {
+                        const topRepos = repos
+                            .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
+                            .slice(0, 5)
+                            .map(r => {
+                                const stars = r.stargazers_count > 0 ? ` ⭐${r.stargazers_count}` : '';
+                                const desc = r.description ? ` - ${r.description.substring(0, 80)}` : '';
+                                return `[${r.name}](${r.html_url})${stars}${desc}`;
+                            })
+                            .join('\n');
+
+                        embed.addFields({
+                            name: '� Top Repositories',
+                            value: topRepos || 'No repositories',
+                            inline: false
+                        });
+                    }
+
+                    embed.setTimestamp();
                     return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 }
 
-                // Fetch repository README
                 const readmeResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
                     headers: {
                         'Accept': 'application/vnd.github.v3.raw'
@@ -82,7 +99,8 @@ module.exports = {
                 let readmeContent = '';
                 if (readmeResponse.ok) {
                     const readme = await readmeResponse.text();
-                    readmeContent = readme.length > 4000 ? readme.substring(0, 3997) + '...' : readme;
+                    readmeContent = formatMarkdownForDiscord(readme);
+                    readmeContent = readmeContent.length > 4000 ? readmeContent.substring(0, 3997) + '...' : readmeContent;
                 } else {
                     readmeContent = 'No README found for this repository.';
                 }
@@ -97,7 +115,6 @@ module.exports = {
                 await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 
             } else {
-                // Local repository
                 let readmeContent = 'No README found in the repository.';
                 try {
                     const fs = require('fs');
@@ -108,7 +125,8 @@ module.exports = {
                         const readmePath = path.join(process.cwd(), filename);
                         if (fs.existsSync(readmePath)) {
                             const readme = fs.readFileSync(readmePath, 'utf-8');
-                            readmeContent = readme.length > 4000 ? readme.substring(0, 3997) + '...' : readme;
+                            readmeContent = formatMarkdownForDiscord(readme);
+                            readmeContent = readmeContent.length > 4000 ? readmeContent.substring(0, 3997) + '...' : readmeContent;
                             break;
                         }
                     }
@@ -131,3 +149,23 @@ module.exports = {
         }
     },
 };
+
+function formatMarkdownForDiscord(markdown) {
+    return markdown
+        .replace(/!\[.*?\]\(.*?\)/g, '[Image]')
+        .replace(/^### (.*?)$/gm, '**• $1**')
+        .replace(/^## (.*?)$/gm, '**$1**')
+        .replace(/^# (.*?)$/gm, '**$1**')
+        .replace(/\*\*(.*?)\*\*/g, '**$1**')
+        .replace(/__(.+?)__/g, '**$1**')
+        .replace(/\*(.*?)\*/g, '_$1_')
+        .replace(/_(.+?)_/g, '_$1_')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '[$1]($2)')
+        .replace(/<[^>]*>/g, '')
+        .replace(/```[\s\S]*?```/g, '`code block`')
+        .replace(/^- (.*?)$/gm, '• $1')
+        .replace(/^\* (.*?)$/gm, '• $1')
+        .replace(/^\d+\. (.*?)$/gm, '→ $1')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
