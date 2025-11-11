@@ -21,9 +21,8 @@ try {
 console.log('Starting bot...');
 
 try {
-    require('./src/index.js').then(() => {
-        console.log(`Bot started successfully, it took ${Date.now() - time}ms to start.`);
-    });
+    require('./src/index.js');
+    console.log(`Bot started successfully, it took ${Date.now() - time}ms to start.`);
 } catch (error) {
     console.error(`Error starting bot: ${error.message}`);
 }
