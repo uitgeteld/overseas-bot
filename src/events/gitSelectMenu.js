@@ -13,7 +13,7 @@ module.exports = {
 
                 let commits;
 
-                if (repo) {
+                if (repo && repo.includes('/')) {
                     const [owner, repoName] = repo.split('/');
                     const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
 
