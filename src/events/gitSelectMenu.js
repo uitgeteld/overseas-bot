@@ -200,6 +200,8 @@ module.exports = {
                 )
                 .setTimestamp();
 
+            console.log(`Embed URL: ${repo ? `https://github.com/${repo}/commit/${hash}` : 'undefined'}`);
+
             if (fileChanges) {
                 embed.addFields({
                     name: 'Files Changed',

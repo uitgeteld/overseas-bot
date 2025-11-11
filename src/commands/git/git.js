@@ -134,7 +134,8 @@ module.exports = {
                     if (remoteUrl.includes('github.com')) {
                         let match = remoteUrl.match(/github\.com[\/:](.+)\/(.+?)(\.git)?$/);
                         if (match) {
-                            embedUrl = `https://github.com/${match[1]}/${match[2]}`;
+                            repo = `${match[1]}/${match[2]}`;
+                            embedUrl = `https://github.com/${repo}`;
                         }
                     }
                 } catch (error) {
