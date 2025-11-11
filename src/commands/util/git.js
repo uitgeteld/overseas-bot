@@ -17,8 +17,14 @@ module.exports = {
             let commits;
 
             if (repo) {
-                if (repo.includes('github.com')) {
-                    const match = repo.match(/github\.com\/([^\/]+)\/([^\/\s]+)/);
+                if (repo.includes('github.com') || repo.includes('git@github.com')) {
+                    let match;
+                    match = repo.match(/github\.com[\/:]([^\/]+)\/([^\/\s\.]+)/);
+                    
+                    if (!match) {
+                        match = repo.match(/git@github\.com:([^\/]+)\/([^\/\s\.]+)/);
+                    }
+                    
                     if (match) {
                         repo = `${match[1]}/${match[2]}`;
                     } else {
