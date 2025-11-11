@@ -36,6 +36,8 @@ module.exports = {
 
                 const [owner, repoName] = repo.split('/');
                 
+                console.log(`Git command - repo: ${repo}, owner: ${owner}, repoName: ${repoName}`);
+                
                 if (!repoName) {
                     const userResponse = await fetch(`https://api.github.com/users/${owner}`);
                     

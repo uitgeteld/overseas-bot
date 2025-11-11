@@ -273,7 +273,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#00ff00')
                 .setTitle(`Commit: ${shortHash}`)
-                .setURL(`https://github.com/${repo}/commit/${hash}`)
+                .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
                 .setDescription(`**${message}**`)
                 .addFields(
                     { name: 'Author', value: author, inline: true },
