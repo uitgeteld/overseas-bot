@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -31,8 +31,14 @@ module.exports = {
                 });
             });
 
-            const jsonPath = path.join(__dirname, '../../..', 'git-commits.json');
-            fs.writeFileSync(jsonPath, JSON.stringify(commitData, null, 2));
+            // Save to JSON file in root directory
+            const jsonPath = path.join(process.cwd(), 'git-commits.json');
+            try {
+                fs.writeFileSync(jsonPath, JSON.stringify(commitData, null, 2));
+                console.log(`Git commits saved to: ${jsonPath}`);
+            } catch (writeError) {
+                console.error('Failed to write git-commits.json:', writeError);
+            }
 
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')

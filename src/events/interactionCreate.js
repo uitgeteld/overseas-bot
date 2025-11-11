@@ -1,12 +1,11 @@
 const { Interaction, EmbedBuilder } = require("discord.js");
 const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
-        // Handle slash commands
         if (interaction.isCommand()) {
             const command = client.commands.get(interaction.commandName);
 
@@ -39,7 +38,7 @@ module.exports = {
                 try {
                     const selectedId = interaction.values[0];
 
-                    const jsonPath = path.join(__dirname, '../..', 'git-commits.json');
+                    const jsonPath = path.join(process.cwd(), 'git-commits.json');
                     const commitData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
                     const commit = commitData.find(c => c.id === selectedId);
 
