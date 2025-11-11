@@ -32,7 +32,7 @@ try {
 
 try {
     console.log('Installing dependencies...');
-    execSync('npm install --production', { stdio: 'inherit' });
+    execSync('npm install --omit=dev', { stdio: 'inherit' });
     console.log('Dependencies installed!\n');
 } catch (error) {
     console.log(`Error installing dependencies ${error}\n`);
