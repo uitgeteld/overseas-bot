@@ -1,5 +1,6 @@
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const time = Date.now();
+
 try {
     console.log('Pulling latest changes from GitHub...');
     execSync('git pull origin main', { stdio: 'inherit' });
@@ -20,11 +21,21 @@ try {
 
 console.log('Starting bot...');
 
-try {
-    require('./src/index.js');
+const bot = spawn('node', ['src/index.js'], { stdio: 'inherit' });
+
+bot.on('spawn', () => {
     const timeInSeconds = ((Date.now() - time) / 1000).toFixed(1);
     console.log(`Bot started successfully, it took ${timeInSeconds}s to start.`);
-} catch (error) {
+});
+
+bot.on('error', (error) => {
     console.error(`Error starting bot: ${error.message}`);
-}
+});
+
+bot.on('exit', (code) => {
+    if (code !== 0) {
+        console.log(`Bot exited with code ${code}`);
+    }
+    process.exit(code);
+});
 
