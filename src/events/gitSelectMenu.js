@@ -81,7 +81,7 @@ module.exports = {
         try {
             const selectedId = interaction.values[0];
             const customIdParts = interaction.customId.split(':');
-            const repo = customIdParts[1];
+            const repo = customIdParts[1] !== 'undefined' ? customIdParts[1] : undefined;
 
             console.log(`Commit details - customId: ${interaction.customId}, repo: '${repo}'`);
 
