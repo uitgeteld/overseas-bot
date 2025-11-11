@@ -295,7 +295,7 @@ module.exports = {
                 .setStyle(ButtonStyle.Primary);
 
             const row = new ActionRowBuilder().addComponents(backButton);
-            await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
+            await interaction.update({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error(error);
