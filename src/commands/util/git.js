@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } = require('discord.js');
 const { execSync } = require('child_process');
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
                 if (!owner || !repoName) {
                     return await interaction.reply({ 
                         content: 'Invalid repository format. Use: owner/repo (e.g., microsoft/vscode)', 
-                        ephemeral: true 
+                        flags: MessageFlags.Ephemeral 
                     });
                 }
 
@@ -30,7 +30,7 @@ module.exports = {
                 if (!response.ok) {
                     return await interaction.reply({ 
                         content: 'Failed to fetch commits from GitHub. Make sure the repository is public and exists.', 
-                        ephemeral: true 
+                        flags: MessageFlags.Ephemeral 
                     });
                 }
 
@@ -52,7 +52,7 @@ module.exports = {
                 const gitLog = execSync('git log -10 --pretty=format:"%H|%h|%an|%ar|%s"', { encoding: 'utf-8' });
                 
                 if (!gitLog.trim()) {
-                    return await interaction.reply({ content: 'No commits found.', ephemeral: true });
+                    return await interaction.reply({ content: 'No commits found.', flags: MessageFlags.Ephemeral });
                 }
 
                 const commitLines = gitLog.trim().split('\n');
@@ -88,11 +88,11 @@ module.exports = {
                 );
 
             const row = new ActionRowBuilder().addComponents(selectMenu);
-            await interaction.reply({ embeds: [embed], components: [row] });
+            await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
 
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: 'Failed to fetch Git commits.', ephemeral: true });
+            await interaction.reply({ content: 'Failed to fetch Git commits.', flags: MessageFlags.Ephemeral });
         }
     },
 };

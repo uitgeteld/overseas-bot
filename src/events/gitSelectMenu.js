@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags } = require("discord.js");
 const { execSync } = require('child_process');
 
 module.exports = {
@@ -19,14 +19,14 @@ module.exports = {
                 const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
                 
                 if (!response.ok) {
-                    return await interaction.reply({ content: 'Failed to fetch commit from GitHub.', ephemeral: true });
+                    return await interaction.reply({ content: 'Failed to fetch commit from GitHub.', flags: MessageFlags.Ephemeral });
                 }
 
                 const commits = await response.json();
                 const commit = commits[parseInt(selectedId)];
 
                 if (!commit) {
-                    return await interaction.reply({ content: 'Commit not found.', ephemeral: true });
+                    return await interaction.reply({ content: 'Commit not found.', flags: MessageFlags.Ephemeral });
                 }
 
                 hash = commit.sha;
@@ -77,7 +77,7 @@ module.exports = {
                 const commitLine = commitLines[parseInt(selectedId)];
 
                 if (!commitLine) {
-                    return await interaction.reply({ content: 'Commit not found.', ephemeral: true });
+                    return await interaction.reply({ content: 'Commit not found.', flags: MessageFlags.Ephemeral });
                 }
 
                 [hash, shortHash, author, date, message] = commitLine.split('|');
@@ -139,11 +139,11 @@ module.exports = {
                 });
             }
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: 'Failed to fetch commit details.', ephemeral: true });
+            await interaction.reply({ content: 'Failed to fetch commit details.', flags: MessageFlags.Ephemeral });
         }
     },
 };
