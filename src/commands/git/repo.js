@@ -3,7 +3,7 @@ const { execSync } = require('child_process');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('git')
+        .setName('repo')
         .setDescription('View the latest Git commits and changes')
         .addStringOption(option =>
             option.setName('repo')
