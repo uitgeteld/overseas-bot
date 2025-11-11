@@ -127,7 +127,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
-                .setURL(repo && commit.author ? `https://github.com/${commit.author}/${repo}` : undefined)
+                .setURL(repo ? `https://github.com/${repo}` : undefined)
                 .setDescription('Select a commit from the dropdown to view details')
                 .setTimestamp();
 
