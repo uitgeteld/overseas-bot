@@ -86,7 +86,7 @@ module.exports = {
                 repo = interaction.customId.substring('git-commit-select:'.length);
             }
 
-            console.log(`Commit details - customId: ${interaction.customId}, repo: '${repo}'`);
+            console.log(`Commit details - customId: ${interaction.customId}, repo:`, repo);
 
             let hash, shortHash, author, date, message, fileChanges, codeChanges;
 
