@@ -146,8 +146,8 @@ module.exports = {
                                 .join('\n')
                                 .trim();
                             
-                            if (cleanPatch.length > 500) {
-                                return { filename: file.filename, patch: cleanPatch.substring(0, 497) + '...' };
+                            if (cleanPatch.length > 950) {
+                                return { filename: file.filename, patch: cleanPatch.substring(0, 947) + '...' };
                             }
                             return { filename: file.filename, patch: cleanPatch };
                         })
@@ -184,7 +184,7 @@ module.exports = {
                     .slice(0, 10)
                     .map(line => {
                         const filename = line.split('|')[0].trim();
-                        return `📄 ${filename}`;
+                        return `${filename}`;
                     })
                     .join('\n');
 
@@ -215,8 +215,8 @@ module.exports = {
                     .slice(0, 2)
                     .map(file => {
                         const cleanPatch = file.patch.trim();
-                        if (cleanPatch.length > 1000) {
-                            return { filename: file.filename, patch: cleanPatch.substring(0, 997) + '...' };
+                        if (cleanPatch.length > 950) {
+                            return { filename: file.filename, patch: cleanPatch.substring(0, 947) + '...' };
                         }
                         return { filename: file.filename, patch: cleanPatch };
                     })
@@ -247,7 +247,7 @@ module.exports = {
 
             if (fileChanges) {
                 embed.addFields({
-                    name: 'Files Changed',
+                    name: '📄 Files Changed',
                     value: `\`\`\`\n${fileChanges}\n\`\`\``,
                     inline: false
                 });
