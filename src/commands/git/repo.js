@@ -60,7 +60,7 @@ module.exports = {
                     if (userData.location) fields.push({ name: '📍 Location', value: userData.location, inline: true });
                     if (userData.company) fields.push({ name: '🏢 Company', value: userData.company, inline: true });
                     if (userData.blog) fields.push({ name: '🔗 Website', value: userData.blog, inline: true });
-                    fields.push({ name: '📊 Repos', value: userData.public_repos.toString(), inline: true });
+                    fields.push({ name: '📊 Public Repos', value: userData.public_repos.toString(), inline: true });
                     fields.push({ name: '👥 Followers', value: userData.followers.toString(), inline: true });
                     fields.push({ name: '⭐ Following', value: userData.following.toString(), inline: true });
 
