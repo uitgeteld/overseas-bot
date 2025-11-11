@@ -1,90 +1,10 @@
-const { EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 const { execSync } = require('child_process');
 
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
-        if (!interaction.isStringSelectMenu() && !interaction.isButton()) return;
-
-        if (interaction.isButton() && interaction.customId.startsWith('git-back')) {
-            try {
-                const customIdParts = interaction.customId.split(':');
-                const repo = customIdParts[1];
-
-                let commits;
-
-                if (repo && repo.includes('/')) {
-                    const [owner, repoName] = repo.split('/');
-                    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
-
-                    if (!response.ok) {
-                        console.error(`GitHub API error: ${response.status} ${response.statusText}`);
-                        return await interaction.reply({
-                            content: `Failed to fetch commits from this repository. (${response.status})`,
-                            flags: MessageFlags.Ephemeral
-                        });
-                    }
-
-                    const githubCommits = await response.json();
-                    commits = githubCommits.map((commit, index) => {
-                        const date = new Date(commit.commit.author.date);
-                        const relativeTime = getRelativeTime(date);
-                        return {
-                            id: index.toString(),
-                            hash: commit.sha,
-                            shortHash: commit.sha.substring(0, 7),
-                            author: commit.commit.author.name,
-                            date: relativeTime,
-                            message: commit.commit.message.split('\n')[0]
-                        };
-                    });
-                } else {
-                    const gitLog = execSync('git log -10 --pretty=format:"%H|%h|%an|%ar|%s"', { encoding: 'utf-8' });
-                    const commitLines = gitLog.trim().split('\n');
-                    commits = commitLines.map((line, index) => {
-                        const [hash, shortHash, author, date, message] = line.split('|');
-                        return { id: index.toString(), hash, shortHash, author, date, message };
-                    });
-                }
-
-                const embed = new EmbedBuilder()
-                    .setColor('#0099ff')
-                    .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
-                    .setURL(repo ? `https://github.com/${repo}` : undefined)
-                    .setDescription('Select a commit from the dropdown to view details')
-                    .setTimestamp();
-
-                commits.forEach(commit => {
-                    embed.addFields({
-                        name: `\`${commit.shortHash}\` - ${commit.message}`,
-                        value: `by ${commit.author} • ${commit.date}`,
-                        inline: false
-                    });
-                });
-
-                const selectMenu = new StringSelectMenuBuilder()
-                    .setCustomId(repo ? `git-commit-select:${repo}` : 'git-commit-select')
-                    .setPlaceholder('Select a commit to view changes')
-                    .addOptions(
-                        commits.map(commit => ({
-                            label: commit.message.substring(0, 100),
-                            description: `${commit.shortHash} by ${commit.author}`,
-                            value: commit.id
-                        }))
-                    );
-
-                const row = new ActionRowBuilder().addComponents(selectMenu);
-                await interaction.update({ embeds: [embed], components: [row] });
-
-            } catch (error) {
-                console.error(error);
-                await interaction.reply({
-                    content: 'Failed to fetch repository commits.',
-                    flags: MessageFlags.Ephemeral
-                });
-            }
-            return;
-        }
+        if (!interaction.isStringSelectMenu()) return;
 
         if (interaction.customId.startsWith('git-user-repo-select')) {
             try {
@@ -93,14 +13,11 @@ module.exports = {
                 const repoName = interaction.values[0];
                 const repo = `${username}/${repoName}`;
 
-                console.log(`Fetching commits for: ${repo} (username: ${username}, repoName: ${repoName})`);
-
                 const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=10`);
 
                 if (!response.ok) {
-                    console.error(`GitHub API error for ${repo}: ${response.status} ${response.statusText}`);
                     return await interaction.reply({
-                        content: `Failed to fetch commits from this repository. (${response.status})`,
+                        content: 'Failed to fetch commits from this repository.',
                         flags: MessageFlags.Ephemeral
                     });
                 }
@@ -122,7 +39,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setColor('#0099ff')
                     .setTitle(`Latest Commits - ${repo}`)
-                    .setURL(`https://github.com/${repo}`)
+                    .setURL(repo ? `https://github.com/${owner}/${repo}` : undefined)
                     .setDescription('Select a commit from the dropdown to view details')
                     .setTimestamp();
 
@@ -162,17 +79,12 @@ module.exports = {
 
         try {
             const selectedId = interaction.values[0];
-            let repo = '';
-            
-            if (interaction.customId.includes(':')) {
-                repo = interaction.customId.substring('git-commit-select:'.length);
-            }
-
-            console.log(`Commit select - customId: ${interaction.customId}, repo: '${repo}'`);
+            const customIdParts = interaction.customId.split(':');
+            const repo = customIdParts[1];
 
             let hash, shortHash, author, date, message, fileChanges, codeChanges;
 
-            if (repo && repo.includes('/')) {
+            if (repo) {
                 const [owner, repoName] = repo.split('/');
                 const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
 
@@ -273,7 +185,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#00ff00')
                 .setTitle(`Commit: ${shortHash}`)
-                .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
+                .setURL(`https://github.com/${repo}/commit/${hash}`)
                 .setDescription(`**${message}**`)
                 .addFields(
                     { name: 'Author', value: author, inline: true },
@@ -298,13 +210,7 @@ module.exports = {
                 });
             }
 
-            const backButton = new ButtonBuilder()
-                .setCustomId(`git-back:${repo}`)
-                .setLabel('← Back to Commits')
-                .setStyle(ButtonStyle.Primary);
-
-            const row = new ActionRowBuilder().addComponents(backButton);
-            await interaction.update({ embeds: [embed], components: [row] });
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 
         } catch (error) {
             console.error(error);
