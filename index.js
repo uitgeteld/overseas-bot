@@ -4,13 +4,13 @@ const startTime = Date.now();
 try {
     console.log('Checking for updates...');
     execSync('git fetch origin main', { stdio: 'pipe' });
-    
+
     const changes = execSync('git log HEAD..origin/main --oneline', { encoding: 'utf-8' });
-    
+
     if (changes.trim()) {
         console.log('\nNew commits found:');
         console.log(changes);
-        
+
         const diffStat = execSync('git diff --stat HEAD..origin/main', { encoding: 'utf-8' });
         console.log('Files changed:');
         console.log(diffStat);
@@ -43,4 +43,3 @@ console.log(`Setup completed in ${setupTime}s\n`);
 
 console.log('Starting bot...');
 require('./src/index.js');
-
