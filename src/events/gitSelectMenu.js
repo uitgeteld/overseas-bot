@@ -215,8 +215,8 @@ module.exports = {
                     .slice(0, 2)
                     .map(file => {
                         const cleanPatch = file.patch.trim();
-                        if (cleanPatch.length > 500) {
-                            return { filename: file.filename, patch: cleanPatch.substring(0, 497) + '...' };
+                        if (cleanPatch.length > 1000) {
+                            return { filename: file.filename, patch: cleanPatch.substring(0, 997) + '...' };
                         }
                         return { filename: file.filename, patch: cleanPatch };
                     })
