@@ -65,7 +65,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
-                .setDescription(repo ? 'Showing commits from external repository' : 'Select a commit from the dropdown to view details')
+                .setDescription('Select a commit from the dropdown to view details')
                 .setTimestamp();
 
             commits.forEach(commit => {
@@ -76,23 +76,19 @@ module.exports = {
                 });
             });
 
-            if (!repo) {
-                const selectMenu = new StringSelectMenuBuilder()
-                    .setCustomId('git-commit-select')
-                    .setPlaceholder('Select a commit to view changes')
-                    .addOptions(
-                        commits.map(commit => ({
-                            label: commit.message.substring(0, 100),
-                            description: `${commit.shortHash} by ${commit.author}`,
-                            value: commit.id
-                        }))
-                    );
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId(repo ? `git-commit-select:${repo}` : 'git-commit-select')
+                .setPlaceholder('Select a commit to view changes')
+                .addOptions(
+                    commits.map(commit => ({
+                        label: commit.message.substring(0, 100),
+                        description: `${commit.shortHash} by ${commit.author}`,
+                        value: commit.id
+                    }))
+                );
 
-                const row = new ActionRowBuilder().addComponents(selectMenu);
-                await interaction.reply({ embeds: [embed], components: [row] });
-            } else {
-                await interaction.reply({ embeds: [embed] });
-            }
+            const row = new ActionRowBuilder().addComponents(selectMenu);
+            await interaction.reply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error(error);
