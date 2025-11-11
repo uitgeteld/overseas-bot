@@ -20,6 +20,8 @@
   "type": "commonjs",
   "main": "src/index.js",
   "scripts": {
+    "prestart": "git pull origin main",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
