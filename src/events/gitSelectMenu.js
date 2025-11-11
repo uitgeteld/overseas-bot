@@ -1,10 +1,82 @@
-const { EmbedBuilder, MessageFlags } = require("discord.js");
+const { EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 const { execSync } = require('child_process');
 
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
         if (!interaction.isStringSelectMenu()) return;
+        
+        // Handle user repository selection
+        if (interaction.customId.startsWith('git-user-repo-select')) {
+            try {
+                const customIdParts = interaction.customId.split(':');
+                const username = customIdParts[1];
+                const repoName = interaction.values[0];
+                const repo = `${username}/${repoName}`;
+
+                // Fetch commits for the selected repository
+                const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=10`);
+                
+                if (!response.ok) {
+                    return await interaction.reply({ 
+                        content: 'Failed to fetch commits from this repository.', 
+                        flags: MessageFlags.Ephemeral 
+                    });
+                }
+
+                const githubCommits = await response.json();
+                const commits = githubCommits.map((commit, index) => {
+                    const date = new Date(commit.commit.author.date);
+                    const relativeTime = getRelativeTime(date);
+                    return {
+                        id: index.toString(),
+                        hash: commit.sha,
+                        shortHash: commit.sha.substring(0, 7),
+                        author: commit.commit.author.name,
+                        date: relativeTime,
+                        message: commit.commit.message.split('\n')[0]
+                    };
+                });
+
+                const embed = new EmbedBuilder()
+                    .setColor('#0099ff')
+                    .setTitle(`Latest Commits - ${repo}`)
+                    .setDescription('Select a commit from the dropdown to view details')
+                    .setTimestamp();
+
+                commits.forEach(commit => {
+                    embed.addFields({
+                        name: `\`${commit.shortHash}\` - ${commit.message}`,
+                        value: `by ${commit.author} • ${commit.date}`,
+                        inline: false
+                    });
+                });
+
+                const selectMenu = new StringSelectMenuBuilder()
+                    .setCustomId(`git-commit-select:${repo}`)
+                    .setPlaceholder('Select a commit to view changes')
+                    .addOptions(
+                        commits.map(commit => ({
+                            label: commit.message.substring(0, 100),
+                            description: `${commit.shortHash} by ${commit.author}`,
+                            value: commit.id
+                        }))
+                    );
+
+                const row = new ActionRowBuilder().addComponents(selectMenu);
+                await interaction.update({ embeds: [embed], components: [row] });
+
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({ 
+                    content: 'Failed to fetch repository commits.', 
+                    flags: MessageFlags.Ephemeral 
+                });
+            }
+            return;
+        }
+
+        // Handle commit selection
         if (!interaction.customId.startsWith('git-commit-select')) return;
 
         try {

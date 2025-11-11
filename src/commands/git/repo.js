@@ -7,7 +7,7 @@ module.exports = {
         .setDescription('View the latest Git commits and changes')
         .addStringOption(option =>
             option.setName('repo')
-                .setDescription('GitHub repository (owner/repo or URL) - defaults to uitgeteld/overseas-bot')
+                .setDescription('GitHub user or repository (username or owner/repo or URL)')
                 .setRequired(false)
         ),
     // devOnly: true,
@@ -36,11 +36,52 @@ module.exports = {
                 }
 
                 const [owner, repoName] = repo.split('/');
-                if (!owner || !repoName) {
-                    return await interaction.reply({ 
-                        content: 'Invalid repository format. Use: owner/repo or paste a GitHub URL', 
-                        flags: MessageFlags.Ephemeral 
-                    });
+                
+                if (!repoName) {
+                    const userResponse = await fetch(`https://api.github.com/users/${owner}`);
+                    
+                    if (!userResponse.ok) {
+                        return await interaction.reply({ 
+                            content: 'Failed to fetch user from GitHub. Make sure the username exists.', 
+                            flags: MessageFlags.Ephemeral 
+                        });
+                    }
+
+                    const userData = await userResponse.json();
+
+                    const reposResponse = await fetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=10`);
+                    const repos = await reposResponse.json();
+
+                    const embed = new EmbedBuilder()
+                        .setColor('#0099ff')
+                        .setTitle(`👤 ${userData.name || userData.login}`)
+                        .setURL(userData.html_url)
+                        .setThumbnail(userData.avatar_url)
+                        .setDescription(userData.bio || 'No bio available')
+                        .addFields(
+                            { name: '📍 Location', value: userData.location || 'Not specified', inline: true },
+                            { name: '📊 Public Repos', value: userData.public_repos.toString(), inline: true },
+                            { name: '👥 Followers', value: userData.followers.toString(), inline: true },
+                            { name: '📧 Email', value: userData.email || 'Not public', inline: true },
+                            { name: '🏢 Company', value: userData.company || 'Not specified', inline: true },
+                            { name: '🔗 Blog', value: userData.blog || 'None', inline: true }
+                        )
+                        .setTimestamp();
+
+                    if (repos.length > 0) {
+                        const repoList = repos
+                            .slice(0, 5)
+                            .map(r => `[${r.name}](${r.html_url}) - ${r.description || 'No description'}`)
+                            .join('\n');
+                        
+                        embed.addFields({
+                            name: '📦 Recent Repositories',
+                            value: repoList,
+                            inline: false
+                        });
+                    }
+
+                    return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 }
 
                 const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
@@ -66,6 +107,20 @@ module.exports = {
                     };
                 });
 
+                const readmeResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3.raw'
+                    }
+                });
+                
+                let readmeContent = '';
+                if (readmeResponse.ok) {
+                    const readme = await readmeResponse.text();
+                    readmeContent = readme.length > 2000 ? readme.substring(0, 1997) + '...' : readme;
+                } else {
+                    readmeContent = 'No README found for this repository.';
+                }
+
             } else {
                 const gitLog = execSync('git log -10 --pretty=format:"%H|%h|%an|%ar|%s"', { encoding: 'utf-8' });
                 
@@ -78,12 +133,33 @@ module.exports = {
                     const [hash, shortHash, author, date, message] = line.split('|');
                     return { id: index.toString(), hash, shortHash, author, date, message };
                 });
+
+                let readmeContent = '';
+                try {
+                    const fs = require('fs');
+                    const path = require('path');
+                    
+                    const readmeFiles = ['README.md', 'readme.md', 'README.MD', 'README.txt', 'README'];
+                    for (const filename of readmeFiles) {
+                        const readmePath = path.join(process.cwd(), filename);
+                        if (fs.existsSync(readmePath)) {
+                            const readme = fs.readFileSync(readmePath, 'utf-8');
+                            readmeContent = readme.length > 2000 ? readme.substring(0, 1997) + '...' : readme;
+                            break;
+                        }
+                    }
+                    if (!readmeContent) {
+                        readmeContent = 'No README found in the repository.';
+                    }
+                } catch (error) {
+                    readmeContent = 'Could not read README file.';
+                }
             }
 
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
-                .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
-                .setDescription('Select a commit from the dropdown to view details')
+                .setTitle(repo ? `📦 ${repo}` : '📦 Repository Info')
+                .setDescription(readmeContent || 'Select a commit from the dropdown to view details')
                 .setTimestamp();
 
             commits.forEach(commit => {
