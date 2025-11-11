@@ -7,20 +7,32 @@ module.exports = {
         .setDescription('View the latest Git commits and changes')
         .addStringOption(option =>
             option.setName('repo')
-                .setDescription('GitHub repository (owner/repo) - defaults to uitgeteld/overseas-bot')
+                .setDescription('GitHub repository (owner/repo or URL) - defaults to uitgeteld/overseas-bot')
                 .setRequired(false)
         ),
     devOnly: true,
     async execute(interaction, client) {
         try {
-            const repo = interaction.options.getString('repo');
+            let repo = interaction.options.getString('repo');
             let commits;
 
             if (repo) {
+                if (repo.includes('github.com')) {
+                    const match = repo.match(/github\.com\/([^\/]+)\/([^\/\s]+)/);
+                    if (match) {
+                        repo = `${match[1]}/${match[2]}`;
+                    } else {
+                        return await interaction.reply({ 
+                            content: 'Invalid GitHub URL format.', 
+                            flags: MessageFlags.Ephemeral 
+                        });
+                    }
+                }
+
                 const [owner, repoName] = repo.split('/');
                 if (!owner || !repoName) {
                     return await interaction.reply({ 
-                        content: 'Invalid repository format. Use: owner/repo (e.g., microsoft/vscode)', 
+                        content: 'Invalid repository format. Use: owner/repo or paste a GitHub URL', 
                         flags: MessageFlags.Ephemeral 
                     });
                 }
