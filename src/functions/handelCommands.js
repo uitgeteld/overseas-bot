@@ -16,9 +16,7 @@ module.exports = (client) => {
             }
         }
 
-        const rest = new REST({
-            version: '9'
-        }).setToken(process.env.token);
+        const rest = new REST().setToken(process.env.TOKEN);
 
         (async () => {
             try {
@@ -26,8 +24,8 @@ module.exports = (client) => {
 
                 await rest.put(
                     Routes.applicationCommands(clientId), {
-                        body: client.commandArray
-                    },
+                    body: client.commandArray
+                },
                 );
 
                 console.log('Successfully reloaded application (/) commands.');
