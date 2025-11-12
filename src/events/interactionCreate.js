@@ -10,7 +10,7 @@ module.exports = {
         if (!command) return;
 
         if (command.devOnly) {
-            const devIds = process.env.devIds ? process.env.devIds.split(',') : [];
+            const devIds = process.env.DEV_IDS ? process.env.DEV_IDS.split(',') : [];
             
             if (!devIds.includes(interaction.user.id)) {
                 return await interaction.reply({ 
