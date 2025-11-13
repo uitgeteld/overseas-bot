@@ -233,7 +233,7 @@ async function handleCommitSelect(interaction) {
             });
         }
 
-        if (allFiles && allFiles.length > 0) {
+        if (allFiles && allFiles.length === 1) {
             const firstFile = allFiles[0];
             const ext = firstFile.filename.split('.').pop().toLowerCase();
             const langLabel = getLanguageLabel(ext);
