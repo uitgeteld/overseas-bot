@@ -53,7 +53,7 @@ module.exports = {
                     const repos = await reposResponse.json();
 
                     const embed = new EmbedBuilder()
-                        .setColor('#0099ff')
+                        .setColor('#C9C2B2')
                         .setTitle(`👤 ${userData.name || userData.login}`)
                         .setURL(userData.html_url)
                         .setThumbnail(userData.avatar_url)
@@ -143,7 +143,7 @@ module.exports = {
             }
 
             const embed = new EmbedBuilder()
-                .setColor('#0099ff')
+                .setColor('#C9C2B2')
                 .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
                 .setURL(embedUrl)
                 .setDescription('Select a commit from the dropdown to view details')

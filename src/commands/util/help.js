@@ -9,7 +9,7 @@ module.exports = {
         .setDescription('Replies with a list of available commands'),
     async execute(interaction, client) {
         const embed = new EmbedBuilder()
-            .setColor('#d4cfb2')
+            .setColor('#C9C2B2')
             .setTitle('📚 Bot Commands')
             .setDescription('Here are all the available commands organized by category:')
 

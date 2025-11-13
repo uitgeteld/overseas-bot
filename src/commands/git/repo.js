@@ -50,7 +50,7 @@ module.exports = {
                     const repos = await reposResponse.json();
 
                     const embed = new EmbedBuilder()
-                        .setColor('#0099ff')
+                        .setColor('#C9C2B2')
                         .setTitle(`👤 ${userData.name || userData.login}`)
                         .setURL(`https://github.com/${owner}`)
                         .setThumbnail(userData.avatar_url)
@@ -106,7 +106,7 @@ module.exports = {
                 }
 
                 const embed = new EmbedBuilder()
-                    .setColor('#0099ff')
+                    .setColor('#C9C2B2')
                     .setTitle(`📦 ${repo}`)
                     .setURL(`https://github.com/${owner}/${repoName}`)
                     .setDescription(readmeContent)
@@ -135,7 +135,7 @@ module.exports = {
                 }
 
                 const embed = new EmbedBuilder()
-                    .setColor('#0099ff')
+                    .setColor('#C9C2B2')
                     .setTitle('📦 Local Repository')
                     .setDescription(readmeContent)
                     .setTimestamp();

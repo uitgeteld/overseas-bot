@@ -38,7 +38,7 @@ module.exports = {
                 });
 
                 const embed = new EmbedBuilder()
-                    .setColor('#0099ff')
+                    .setColor('#C9C2B2')
                     .setTitle(`Latest Commits - ${repo}`)
                     .setURL(`https://github.com/${repo}`)
                     .setDescription('Select a commit from the dropdown to view details')
@@ -201,7 +201,7 @@ async function handleCommitSelect(interaction) {
         }
 
         const embed = new EmbedBuilder()
-            .setColor('#00ff00')
+            .setColor('#C9C2B2')
             .setTitle(`Commit: ${shortHash}`)
             .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
             .setDescription(`**${message}**`)
@@ -376,7 +376,7 @@ async function handleFileSelect(interaction) {
         }
 
         const embed = new EmbedBuilder()
-            .setColor('#0099ff')
+            .setColor('#C9C2B2')
             .setTitle(`📄 ${selectedFile.filename} (${langLabel})`)
             .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
             .setDescription(`**${message}**`)
