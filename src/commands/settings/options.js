@@ -17,14 +17,14 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('options_toggle_npm_install')
-                    .setLabel('Toggle Npm Install')
-                    .setStyle(client.startOptions?.npmInstall ? 'Danger' : 'Success'),
-
-                new ButtonBuilder()
                     .setCustomId('options_toggle_git_pull')
                     .setLabel('Toggle Git Pull')
-                    .setStyle(client.startOptions?.gitPull ? 'Danger' : 'Success')
+                    .setStyle(client.startOptions?.gitPull ? 'Danger' : 'Success'),
+
+                new ButtonBuilder()
+                    .setCustomId('options_toggle_npm_install')
+                    .setLabel('Toggle Npm Install')
+                    .setStyle(client.startOptions?.npmInstall ? 'Danger' : 'Success')
             );
         return await interaction.reply({
             embeds: [embed], components: [row], ephemeral: true
