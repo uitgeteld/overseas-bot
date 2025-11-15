@@ -9,7 +9,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setColor('#C9C2B2')
-            .setTitle('⚙️ Bot Options')
+            .setTitle('⚙️ Start Options')
             .setFields(
                 { name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true },
                 { name: '📚 Npm Install', value: client.startOptions?.npmInstall ? 'Enabled' : ' Disabled', inline: true });
@@ -19,12 +19,12 @@ module.exports = {
                 new ButtonBuilder()
                     .setCustomId('options_toggle_npm_install')
                     .setLabel('Toggle Npm Install')
-                    .setStyle(client.botOptions?.npmInstall ? 'Danger' : 'Success'),
+                    .setStyle(client.startOptions?.npmInstall ? 'Danger' : 'Success'),
 
                 new ButtonBuilder()
                     .setCustomId('options_toggle_git_pull')
                     .setLabel('Toggle Git Pull')
-                    .setStyle(client.botOptions?.gitPull ? 'Danger' : 'Success')
+                    .setStyle(client.startOptions?.gitPull ? 'Danger' : 'Success')
             );
         return await interaction.reply({
             embeds: [embed], components: [row], ephemeral: true
