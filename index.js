@@ -1,5 +1,7 @@
 const { execSync } = require('child_process');
 const startTime = Date.now();
+const { gitPull, npmInstall } = require('./startOptions.json');
+
 
 try {
     console.log('Checking for updates...');
@@ -21,21 +23,25 @@ try {
     console.log(`Could not check for updates ${error}\n`);
 }
 
-try {
-    console.log('Pulling latest changes from GitHub...');
-    execSync('git pull origin main', { stdio: 'inherit' });
-    console.log('Successfully updated from GitHub!\n');
-} catch (error) {
-    console.log(`Could not pull from GitHub ${error}\n`);
-    console.log('Continuing with existing files...\n');
+if (gitPull) {
+    try {
+        console.log('Pulling latest changes from GitHub...');
+        execSync('git pull origin main', { stdio: 'inherit' });
+        console.log('Successfully updated from GitHub!\n');
+    } catch (error) {
+        console.log(`Could not pull from GitHub ${error}\n`);
+        console.log('Continuing with existing files...\n');
+    }
 }
 
-try {
-    console.log('Installing dependencies...');
-    execSync('npm install --omit=dev', { stdio: 'inherit' });
-    console.log('Dependencies installed!\n');
-} catch (error) {
-    console.log(`Error installing dependencies ${error}\n`);
+if (npmInstall) {
+    try {
+        console.log('Installing dependencies...');
+        execSync('npm install --omit=dev', { stdio: 'inherit' });
+        console.log('Dependencies installed!\n');
+    } catch (error) {
+        console.log(`Error installing dependencies ${error}\n`);
+    }
 }
 
 const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);

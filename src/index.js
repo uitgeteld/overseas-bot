@@ -1,8 +1,21 @@
 const { Client, GatewayIntentBits, Collection } = require(`discord.js`);
 const fs = require('node:fs');
+const path = require('node:path');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 client.commands = new Collection();
+
+const optionsPath = path.join(__dirname, '../startOptions.json');
+try {
+    const optionsData = fs.readFileSync(optionsPath, 'utf-8');
+    client.startOptions = JSON.parse(optionsData);
+} catch (error) {
+    console.log('No startOptions.json found, using defaults');
+    client.startOptions = {
+        gitPull: true,
+        npmInstall: true
+    };
+}
 
 require('dotenv').config();
 
