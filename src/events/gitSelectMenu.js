@@ -222,9 +222,19 @@ async function handleCommitSelect(interaction) {
         }
 
         if (allFiles && allFiles.length > 0) {
-            const fileList = allFiles
-                .map(f => f.filename)
-                .join('\n');
+            let fileList = '';
+            let filesShown = 0;
+            
+            for (let i = 0; i < allFiles.length; i++) {
+                const testList = fileList + (fileList ? '\n' : '') + allFiles[i].filename;
+                if (testList.length > 950) {
+                    const remaining = allFiles.length - i;
+                    fileList += `\n+ ${remaining} more file${remaining !== 1 ? 's' : ''}`;
+                    break;
+                }
+                fileList = testList;
+                filesShown++;
+            }
 
             embed.addFields({
                 name: `📚 Files Changed (${allFiles.length})`,
@@ -257,7 +267,7 @@ async function handleCommitSelect(interaction) {
                 .setCustomId(`git-file-select:${repo || 'local'}:${hash}`)
                 .setPlaceholder('Select a file to inspect')
                 .addOptions(
-                    allFiles.map((file, index) => ({
+                    allFiles.slice(0, 25).map((file, index) => ({
                         label: file.filename.substring(0, 100),
                         description: `View changes in this file`,
                         value: index.toString()
