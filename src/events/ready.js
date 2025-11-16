@@ -15,9 +15,7 @@ module.exports = {
                             type: statusArray[option].type,
 
                         },
-                    
                     ],
-
                     status: statusArray[option].status
                 })
             } catch (error) {

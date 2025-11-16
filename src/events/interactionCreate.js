@@ -1,4 +1,4 @@
-const { Interaction } = require("discord.js");
+const { MessageFlags } = require("discord.js");
 
 module.exports = {
     name: 'interactionCreate',
@@ -15,7 +15,7 @@ module.exports = {
             if (!devIds.includes(interaction.user.id)) {
                 return await interaction.reply({ 
                     content: 'This command is only available to developers.', 
-                    ephemeral: true 
+                    flags: MessageFlags.Ephemeral
                 });
             }
         }
@@ -26,7 +26,7 @@ module.exports = {
             console.log(error);
             await interaction.reply({
                 content: 'There was an error while executing this command!',
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
     },
