@@ -22,20 +22,20 @@ module.exports = {
                 .setTitle('⚙️ Start Options')
                 .setDescription(`Npm Install toggled to **${client.startOptions.npmInstall ? 'Enabled' : 'Disabled'}**`)
                 .setFields(
-                { name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true },
-                { name: '📚 Npm Install', value: client.startOptions?.npmInstall ? 'Enabled' : ' Disabled', inline: true });
+                    { name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true },
+                    { name: '📚 Npm Install', value: client.startOptions?.npmInstall ? 'Enabled' : ' Disabled', inline: true });
 
             const row = new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()
-                        .setCustomId('options_toggle_npm_install')
-                        .setLabel('Toggle Npm Install')
-                        .setStyle(client.startOptions.npmInstall ? 'Danger' : 'Success'),
-
-                    new ButtonBuilder()
                         .setCustomId('options_toggle_git_pull')
                         .setLabel('Toggle Git Pull')
-                        .setStyle(client.startOptions.gitPull ? 'Danger' : 'Success')
+                        .setStyle(client.startOptions.gitPull ? 'Danger' : 'Success'),
+
+                    new ButtonBuilder()
+                        .setCustomId('options_toggle_npm_install')
+                        .setLabel('Toggle Npm Install')
+                        .setStyle(client.startOptions.npmInstall ? 'Danger' : 'Success')
                 );
 
             return await interaction.update({ embeds: [embed], components: [row] });
@@ -50,19 +50,19 @@ module.exports = {
                 .setTitle('⚙️ Bot Options')
                 .setDescription(`Git Pull toggled to **${client.startOptions.gitPull ? 'Enabled' : 'Disabled'}**`)
                 .setFields(
-                { name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true },
-                { name: '📚 Npm Install', value: client.startOptions?.npmInstall ? 'Enabled' : ' Disabled', inline: true });
+                    { name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true },
+                    { name: '📚 Npm Install', value: client.startOptions?.npmInstall ? 'Enabled' : ' Disabled', inline: true });
             const row = new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()
-                        .setCustomId('options_toggle_npm_install')
-                        .setLabel('Toggle Npm Install')
-                        .setStyle(client.startOptions.npmInstall ? 'Danger' : 'Success'),
-
-                    new ButtonBuilder()
                         .setCustomId('options_toggle_git_pull')
                         .setLabel('Toggle Git Pull')
-                        .setStyle(client.startOptions.gitPull ? 'Danger' : 'Success')
+                        .setStyle(client.startOptions.gitPull ? 'Danger' : 'Success'),
+
+                    new ButtonBuilder()
+                        .setCustomId('options_toggle_npm_install')
+                        .setLabel('Toggle Npm Install')
+                        .setStyle(client.startOptions.npmInstall ? 'Danger' : 'Success')
                 );
 
             return await interaction.update({ embeds: [embed], components: [row] });
