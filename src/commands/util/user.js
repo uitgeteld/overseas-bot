@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, Client, BaseInteraction } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,11 +7,6 @@ module.exports = {
         .addUserOption(option =>
             option.setName('target')
                 .setDescription('The user to get information about')),
-    /**
-     * 
-     * @param {BaseInteraction} interaction 
-     * @param {Client} client 
-     */
     async execute(interaction, client) {
         const user = interaction.options.getUser('target') || interaction.user;
         const fullUser = await client.users.fetch(user.id, { force: true });
@@ -28,7 +23,7 @@ module.exports = {
                     .map(r => `<@&${r.id}>`)
                     .join(' ');
 
-                if (member.roles.cache.size > 6) { 
+                if (member.roles.cache.size > 6) {
                     rolesText = `${roles} +${member.roles.cache.size - 6} more`;
                 } else {
                     rolesText = roles || 'None';
@@ -51,6 +46,6 @@ module.exports = {
             embed.setImage(fullUser.bannerURL({ size: 1_024 }));
         }
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     },
 };

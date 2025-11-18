@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,7 +27,7 @@ module.exports = {
                     .setStyle(client.startOptions?.npmInstall ? 'Danger' : 'Success')
             );
         return await interaction.reply({
-            embeds: [embed], components: [row], ephemeral: true
+            embeds: [embed], components: [row], flags: MessageFlags.Ephemeral 
         })
 
     },

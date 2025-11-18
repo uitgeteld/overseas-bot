@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 const categorizer = require('../../helpers/categorizerHelper');
@@ -17,7 +17,7 @@ module.exports = {
         if (commandName) {
             const command = client.commands.get(commandName);
             if (!command) {
-                return await interaction.reply({ content: 'That command does not exist.', ephemeral: true });
+                return await interaction.reply({ content: 'That command does not exist.', flags: MessageFlags.Ephemeral  });
             }
             const embed = new EmbedBuilder()
                 .setColor('#C9C2B2')
