@@ -1,5 +1,5 @@
 {
-  "name": "overseas",
+  "name": "overseas-bot",
   "version": "1.0.0",
   "description": "overseas is just a fun discord bot",
   "keywords": [
@@ -21,10 +21,9 @@
   "main": "index.js",
   "scripts": {
     "prestart": "git pull origin main",
-    "preinstall": "npm install -D tsx",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --minify"
+    "build": "tsup src/index.ts"
   },
   "dependencies": {
     "discord.js": "^14.25.0",
