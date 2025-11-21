@@ -1,5 +1,5 @@
 .env
 node_modules/
 package-lock.json
-src/commands/git/repo.js
 startOptions.json
+dist/

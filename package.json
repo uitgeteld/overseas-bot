@@ -23,7 +23,7 @@
     "prestart": "git pull origin main",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts"
+    "build": "tsc"
   },
   "dependencies": {
     "discord.js": "^14.25.0",

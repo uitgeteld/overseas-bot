@@ -53,7 +53,7 @@ if (npmInstall) {
     try {
         console.log('Installing dependencies...');
         execSync('npm install --omit=dev', { stdio: 'inherit' });
-        execSync('npm install -D tsx', { stdio: 'inherit' });
+        // execSync('npm install -D tsx', { stdio: 'inherit' });
         console.log('Dependencies installed!\n');
     } catch (error) {
         console.log(`Error installing dependencies ${error}\n`);
