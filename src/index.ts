@@ -1,7 +1,21 @@
-const { execSync } = require('child_process');
-const startTime = Date.now();
-const { gitPull, npmInstall } = require('./startOptions.json');
+import { Client, GatewayIntentBits } from "discord.js";
+import { config, loadStartOptions } from "./config";
+import path from "path";
+import { handleCommands } from "./functions/handleCommands";
+import { handleEvents } from "./functions/handleEvents";
+import { execSync } from "child_process";
+import { gitPull, npmInstall } from "../startOptions.json";
 
+const client = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+}) as Client;
+
+loadStartOptions(client);
+
+const commandsPath = path.join(__dirname, "./commands");
+const eventsPath = path.join(__dirname, "./events");
+
+const startTime = Date.now();
 
 try {
     console.log('Checking for updates...');
@@ -16,7 +30,7 @@ try {
         const diffStat = execSync('git diff --stat HEAD..origin/main', { encoding: 'utf-8' });
         console.log('Files changed:');
         console.log(diffStat);
-        
+
         if (gitPull) {
             try {
                 console.log('Pulling latest changes from GitHub...');
@@ -39,6 +53,7 @@ if (npmInstall) {
     try {
         console.log('Installing dependencies...');
         execSync('npm install --omit=dev', { stdio: 'inherit' });
+        execSync('npm install -D tsx', { stdio: 'inherit' });
         console.log('Dependencies installed!\n');
     } catch (error) {
         console.log(`Error installing dependencies ${error}\n`);
@@ -46,7 +61,10 @@ if (npmInstall) {
 }
 
 const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);
-console.log(`Setup completed in ${setupTime}s\n`);
+console.log(`Setup completed in ${setupTime}s\n\n`);
 
-console.log('Starting bot...');
-require('./src/index.js');
+(async () => {
+    await handleCommands(client, commandsPath);
+    handleEvents(client, eventsPath);
+    client.login(config.TOKEN);
+})();

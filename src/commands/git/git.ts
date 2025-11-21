@@ -1,0 +1,199 @@
+import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
+import { execSync } from "child_process";
+import githubFetch from "../../helpers/githubFetcher";
+
+export const data = new SlashCommandBuilder()
+    .setName('git')
+    .setDescription('View the latest Git commits and changes')
+    .addStringOption(option =>
+        option.setName('repo')
+            .setDescription('GitHub username or repository (username or owner/repo or URL)')
+            .setRequired(false));
+
+export async function execute(interaction: ChatInputCommandInteraction) {
+    try {
+        let repo = interaction.options.getString('repo');
+        let commits;
+
+        if (repo) {
+            if (repo.includes('github.com') || repo.includes('git@github.com')) {
+                let match;
+                match = repo.match(/github\.com[\/:]([^\/]+)\/([^\/\s\.]+)/);
+
+                if (!match) {
+                    match = repo.match(/git@github\.com:([^\/]+)\/([^\/\s\.]+)/);
+                }
+
+                if (match) {
+                    repo = `${match[1]}/${match[2]}`;
+                } else {
+                    return await interaction.reply({
+                        content: 'Invalid GitHub URL format.',
+                        flags: MessageFlags.Ephemeral
+                    });
+                }
+            }
+
+            const [owner, repoName] = repo.split('/');
+
+            if (!repoName) {
+                const userResponse = await githubFetch(`https://api.github.com/users/${owner}`);
+
+                if (!userResponse.ok) {
+                    return await interaction.reply({
+                        content: 'Failed to fetch user from GitHub. Make sure the username exists.',
+                        flags: MessageFlags.Ephemeral
+                    });
+                }
+
+                const userData = await userResponse.json();
+
+                const reposResponse = await githubFetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=25`);
+                const repos = await reposResponse.json();
+
+                const embed = new EmbedBuilder()
+                    .setColor('#C9C2B2')
+                    .setTitle(`👤 ${userData.name || userData.login}`)
+                    .setURL(userData.html_url)
+                    .setThumbnail(userData.avatar_url)
+                    .setDescription(userData.bio || 'No bio available')
+                    .addFields(
+                        { name: '📊 Public Repos', value: userData.public_repos.toString(), inline: true },
+                        { name: '👥 Followers', value: userData.followers.toString(), inline: true },
+                        { name: '⭐ Following', value: userData.following.toString(), inline: true }
+                    )
+                    .setTimestamp();
+
+                if (userData.blog) {
+                    embed.addFields({ name: '🔗 Website', value: userData.blog, inline: true });
+                }
+
+                if (repos.length > 0) {
+                    const selectMenu = new StringSelectMenuBuilder()
+                        .setCustomId(`git-user-repo-select:${owner}`)
+                        .setPlaceholder('Select a repository to view commits')
+                        .addOptions(
+                            repos.slice(0, 25).map((r: any) => ({
+                                label: r.name.substring(0, 100),
+                                description: (r.description || 'No description').substring(0, 100),
+                                value: r.name
+                            }))
+                        );
+
+                    const row = new ActionRowBuilder().addComponents(selectMenu);
+                    return await interaction.reply({ embeds: [embed], components: [row.toJSON()] });
+                } else {
+                    return await interaction.reply({ embeds: [embed] });
+                }
+            }
+
+            const response = await githubFetch(`https://api.github.com/repos/${owner}/${repoName}/commits?per_page=10`);
+
+            if (!response.ok) {
+                return await interaction.reply({
+                    content: 'Failed to fetch commits from GitHub. Make sure the repository is public and exists.',
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+
+            const githubCommits = await response.json();
+            commits = githubCommits.map((commit: any, index: number) => {
+                const date = new Date(commit.commit.author.date);
+                const relativeTime = getRelativeTime(date);
+                return {
+                    id: index.toString(),
+                    hash: commit.sha,
+                    shortHash: commit.sha.substring(0, 7),
+                    author: commit.commit.author.name,
+                    date: relativeTime,
+                    message: commit.commit.message.split('\n')[0]
+                };
+            });
+
+        } else {
+            const gitLog = execSync('git log -10 --pretty=format:"%H|%h|%an|%ar|%s"', { encoding: 'utf-8' });
+
+            if (!gitLog.trim()) {
+                return await interaction.reply({ content: 'No commits found.', flags: MessageFlags.Ephemeral });
+            }
+
+            const commitLines = gitLog.trim().split('\n');
+            commits = commitLines.map((line, index) => {
+                const [hash, shortHash, author, date, message] = line.split('|');
+                return { id: index.toString(), hash, shortHash, author, date, message };
+            });
+        }
+
+        let embedUrl: string = '';
+        if (repo) {
+            embedUrl = `https://github.com/${repo}`;
+        } else {
+            try {
+                const remoteUrl = execSync('git config --get remote.origin.url', { encoding: 'utf-8' }).trim();
+                if (remoteUrl.includes('github.com')) {
+                    let match = remoteUrl.match(/github\.com[\/:](.+)\/(.+?)(\.git)?$/);
+                    if (match) {
+                        repo = `${match[1]}/${match[2]}`;
+                        embedUrl = `https://github.com/${repo}`;
+                    }
+                }
+            } catch (error) {
+            }
+        }
+
+        const embed = new EmbedBuilder()
+            .setColor('#C9C2B2')
+            .setTitle(repo ? `Latest Commits - ${repo}` : 'Latest Git Commits')
+            .setURL(embedUrl)
+            .setDescription('Select a commit from the dropdown to view details')
+            .setTimestamp();
+
+        commits.forEach((commit: any) => {
+            embed.addFields({
+                name: `\`${commit.shortHash}\` - ${commit.message}`,
+                value: `by ${commit.author} • ${commit.date}`,
+                inline: false
+            });
+        });
+
+        const selectMenu = new StringSelectMenuBuilder()
+            .setCustomId(repo ? `git-commit-select:${repo}` : 'git-commit-select')
+            .setPlaceholder('Select a commit to view changes')
+            .addOptions(
+                commits.map((commit: any) => ({
+                    label: commit.message.substring(0, 100),
+                    description: `${commit.shortHash} by ${commit.author}`,
+                    value: commit.id
+                }))
+            );
+
+        const row = new ActionRowBuilder().addComponents(selectMenu);
+        await interaction.reply({ embeds: [embed], components: [row.toJSON()] });
+
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'Failed to fetch Git commits.', flags: MessageFlags.Ephemeral });
+    }
+};
+
+function getRelativeTime(date: Date): string {
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    const intervals = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+    };
+
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) {
+            return `${interval} ${unit}${interval !== 1 ? 's' : ''} ago`;
+        }
+    }
+    return 'just now';
+}

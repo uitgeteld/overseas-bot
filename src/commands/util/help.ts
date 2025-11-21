@@ -1,0 +1,61 @@
+import { ChatInputCommandInteraction, SlashCommandBuilder, Client, MessageFlags, EmbedBuilder } from "discord.js";
+import { categorizer } from "../../helpers/categorizer";
+import fs from "node:fs";
+import path from "node:path";
+
+export const data = new SlashCommandBuilder()
+    .setName("help")
+    .setDescription('Replies with a list of available commands')
+    .addStringOption(option =>
+        option.setName('command')
+            .setDescription('The command to get help for')
+            .setRequired(false)
+    );
+
+export async function execute(interaction: ChatInputCommandInteraction, client: Client) {
+    const commandName = interaction.options.getString('command');
+
+    if (commandName) {
+        const command = client.commands.get(commandName);
+        if (!command) {
+            return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
+        }
+        const embed = new EmbedBuilder()
+            .setColor('#C9C2B2')
+            .setTitle(`Command: /${commandName}`)
+            .setDescription(command.data.description || 'No description available.')
+        if (Array.isArray(command.data.options) && command.data.options.length > 0) {
+            const optionsDescription = command.data.options.map((option: { name: string; description?: string }) => {
+                return `\`-${option.name}\`: ${option.description || 'No description'}`;
+            }).join('\n');
+            embed.addFields({ name: 'Options', value: optionsDescription });
+        }
+        return await interaction.reply({ embeds: [embed] });
+    }
+    const embed = new EmbedBuilder()
+        .setColor('#C9C2B2')
+        .setTitle('📚 Bot Commands')
+        .setDescription('Here are all the available commands organized by category:')
+        .setFooter({ text: 'Use /help <command> to get info on a specific command.' });
+
+    const commandsPath = path.join(__dirname, '..');
+    const commandFolders = fs.readdirSync(commandsPath).filter(file => {
+        return fs.statSync(path.join(commandsPath, file)).isDirectory();
+    });
+
+    for (const folder of commandFolders) {
+        const category = categorizer.getCategoryName(folder);
+        const commandList = Array.from(client.commands.values())
+            .filter(cmd => {
+                const cmdPath = path.join(commandsPath, folder, `${cmd.data.name}.ts`);
+                if (cmd.devOnly) return;
+                return fs.existsSync(cmdPath);
+            })
+            .map(cmd => `\`/${cmd.data.name}\``)
+            .join(', ') || false;
+        if (commandList) {
+            embed.addFields({ name: category, value: commandList });
+        }
+    }
+    await interaction.reply({ embeds: [embed] });
+}

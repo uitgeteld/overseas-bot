@@ -1,11 +1,13 @@
-const { EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
-const { execSync } = require('child_process');
-const githubFetch = require('../helpers/githubFetchHelper');
+import { Interaction, Client, EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder } from "discord.js";
+import { execSync } from "child_process";
+import githubFetch from "../helpers/githubFetcher";
 
-module.exports = {
-    name: 'interactionCreate',
-    async execute(interaction, client) {
-        if (!interaction.isStringSelectMenu()) return;
+
+export const name = "interactionCreate";
+export const once = false;
+
+export async function execute(interaction: Interaction, client: Client) {
+    if (!interaction.isStringSelectMenu()) return;
 
         if (interaction.customId.startsWith('git-user-repo-select')) {
             try {
@@ -24,7 +26,7 @@ module.exports = {
                 }
 
                 const githubCommits = await response.json();
-                const commits = githubCommits.map((commit, index) => {
+                const commits = githubCommits.map((commit: any, index: number) => {
                     const date = new Date(commit.commit.author.date);
                     const relativeTime = getRelativeTime(date);
                     return {
@@ -43,7 +45,7 @@ module.exports = {
                     .setURL(`https://github.com/${repo}`)
                     .setDescription('Select a commit from the dropdown to view details')
 
-                commits.forEach(commit => {
+                commits.forEach((commit: any) => {
                     embed.addFields({
                         name: `\`${commit.shortHash}\` - ${commit.message}`,
                         value: `by ${commit.author} • ${commit.date}`,
@@ -55,7 +57,7 @@ module.exports = {
                     .setCustomId(`git-commit-select:${repo}`)
                     .setPlaceholder('Select a commit to view changes')
                     .addOptions(
-                        commits.map(commit => ({
+                        commits.map((commit: any) => ({
                             label: commit.message.substring(0, 100),
                             description: `${commit.shortHash} by ${commit.author}`,
                             value: commit.id
@@ -63,7 +65,7 @@ module.exports = {
                     );
 
                 const row = new ActionRowBuilder().addComponents(selectMenu);
-                await interaction.update({ embeds: [embed], components: [row] });
+                await interaction.update({ embeds: [embed], components: [row.toJSON()] });
 
             } catch (error) {
                 console.error(error);
@@ -84,10 +86,10 @@ module.exports = {
             await handleFileSelect(interaction);
             return;
         }
-    },
-};
+}
 
-async function handleCommitSelect(interaction) {
+
+async function handleCommitSelect(interaction: any): Promise<void> {
     try {
         const selectedId = interaction.values[0];
         let repo;
@@ -126,17 +128,17 @@ async function handleCommitSelect(interaction) {
             const commitDetails = await commitResponse.json();
 
             if (commitDetails.files && commitDetails.files.length > 0) {
-                commitDetails.files.forEach(file => {
+                commitDetails.files.forEach((file: any) => {
                     totalAdditions += file.additions || 0;
                     totalDeletions += file.deletions || 0;
                 });
 
-                allFiles = commitDetails.files.map(file => {
+                allFiles = commitDetails.files.map((file: any) => {
                     if (!file.patch) return null;
 
                     const cleanPatch = file.patch
                         .split('\n')
-                        .filter(line => {
+                        .filter((line: string) => {
                             return !line.startsWith('diff --git') &&
                                 !line.startsWith('index ') &&
                                 !line.startsWith('---') &&
@@ -147,7 +149,7 @@ async function handleCommitSelect(interaction) {
                         .trim();
 
                     return { filename: file.filename, patch: cleanPatch };
-                }).filter(f => f !== null);
+                }).filter((f: any) => f !== null);
             }
 
         } else {
@@ -163,7 +165,7 @@ async function handleCommitSelect(interaction) {
 
             const numstat = execSync(`git show ${hash} --numstat --format=""`, { encoding: 'utf-8' });
 
-            numstat.trim().split('\n').forEach(line => {
+            numstat.trim().split('\n').forEach((line: string) => {
                 if (line.trim()) {
                     const parts = line.split('\t');
                     totalAdditions += parseInt(parts[0]) || 0;
@@ -174,10 +176,10 @@ async function handleCommitSelect(interaction) {
             const diff = execSync(`git diff ${hash}~1 ${hash}`, { encoding: 'utf-8' });
 
             const fileDiffs = [];
-            let currentFile = null;
-            let currentPatch = [];
+            let currentFile: string | null = null;
+            let currentPatch: string[] = [];
 
-            diff.split('\n').forEach(line => {
+            diff.split('\n').forEach((line: string) => {
                 if (line.startsWith('diff --git')) {
                     if (currentFile && currentPatch.length > 0) {
                         fileDiffs.push({ filename: currentFile, patch: currentPatch.join('\n') });
@@ -203,7 +205,7 @@ async function handleCommitSelect(interaction) {
         const embed = new EmbedBuilder()
             .setColor('#C9C2B2')
             .setTitle(`Commit: ${shortHash}`)
-            .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
+            .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : null)
             .setDescription(`**${message}**`)
             .addFields(
                 { name: 'Author', value: author, inline: true },
@@ -267,7 +269,7 @@ async function handleCommitSelect(interaction) {
                 .setCustomId(`git-file-select:${repo || 'local'}:${hash}`)
                 .setPlaceholder('Select a file to inspect')
                 .addOptions(
-                    allFiles.slice(0, 25).map((file, index) => ({
+                    allFiles.slice(0, 25).map((file: any, index: number) => ({
                         label: file.filename.substring(0, 100),
                         description: `View changes in this file`,
                         value: index.toString()
@@ -290,7 +292,7 @@ async function handleCommitSelect(interaction) {
     }
 }
 
-async function handleFileSelect(interaction) {
+async function handleFileSelect(interaction: any): Promise<void> {
     try {
         const selectedFileIndex = parseInt(interaction.values[0]);
         const customIdParts = interaction.customId.split(':');
@@ -310,12 +312,12 @@ async function handleFileSelect(interaction) {
             message = commitDetails.commit?.message?.split('\n')[0] || '';
 
             if (commitDetails.files && commitDetails.files.length > 0) {
-                allFiles = commitDetails.files.map(file => {
+                allFiles = commitDetails.files.map((file: any) => {
                     if (!file.patch) return null;
 
                     const cleanPatch = file.patch
                         .split('\n')
-                        .filter(line => {
+                        .filter((line: string) => {
                             return !line.startsWith('diff --git') &&
                                 !line.startsWith('index ') &&
                                 !line.startsWith('---') &&
@@ -331,7 +333,7 @@ async function handleFileSelect(interaction) {
                         additions: file.additions || 0,
                         deletions: file.deletions || 0
                     };
-                }).filter(f => f !== null);
+                }).filter((f: any) => f !== null);
             }
         } else {
             const diff = execSync(`git diff ${hash}~1 ${hash}`, { encoding: 'utf-8' });
@@ -339,10 +341,10 @@ async function handleFileSelect(interaction) {
             message = commitInfo.trim();
 
             const fileDiffs = [];
-            let currentFile = null;
-            let currentPatch = [];
+            let currentFile: string | null = null;
+            let currentPatch: string[] = [];
 
-            diff.split('\n').forEach(line => {
+            diff.split('\n').forEach((line: string) => {
                 if (line.startsWith('diff --git')) {
                     if (currentFile && currentPatch.length > 0) {
                         fileDiffs.push({ filename: currentFile, patch: currentPatch.join('\n') });
@@ -388,7 +390,7 @@ async function handleFileSelect(interaction) {
         const embed = new EmbedBuilder()
             .setColor('#C9C2B2')
             .setTitle(`📄 ${selectedFile.filename} (${langLabel})`)
-            .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : undefined)
+            .setURL(repo ? `https://github.com/${repo}/commit/${hash}` : null)
             .setDescription(`**${message}**`)
             .addFields({
                 name: '📊 Lines Changed',
@@ -410,7 +412,7 @@ async function handleFileSelect(interaction) {
     }
 }
 
-function getLanguageLabel(ext) {
+function getLanguageLabel(ext: string): string {
     const langMap = {
         'js': 'JavaScript',
         'ts': 'TypeScript',
@@ -433,12 +435,12 @@ function getLanguageLabel(ext) {
         'sh': 'Bash',
         'sql': 'SQL'
     };
-    return langMap[ext] || ext.toUpperCase();
+    return langMap[ext as keyof typeof langMap] || ext.toUpperCase();
 }
 
-function getRelativeTime(date) {
+function getRelativeTime(date: Date): string {
     const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     const intervals = {
         year: 31536000,
