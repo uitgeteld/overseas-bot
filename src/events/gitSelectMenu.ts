@@ -2,12 +2,11 @@ import { Interaction, Client, EmbedBuilder, MessageFlags, ActionRowBuilder, Stri
 import { execSync } from "child_process";
 import githubFetch from "../helpers/githubFetcher";
 
-
-export const name = "interactionCreate";
-export const once = false;
-
-export async function execute(interaction: Interaction, client: Client) {
-    if (!interaction.isStringSelectMenu()) return;
+export default {
+    name: "interactionCreate",
+    once: false,
+    async execute(interaction: Interaction, client: Client) {
+        if (!interaction.isStringSelectMenu()) return;
 
         if (interaction.customId.startsWith('git-user-repo-select')) {
             try {
@@ -86,8 +85,8 @@ export async function execute(interaction: Interaction, client: Client) {
             await handleFileSelect(interaction);
             return;
         }
-}
-
+    }
+};
 
 async function handleCommitSelect(interaction: any): Promise<void> {
     try {
@@ -226,7 +225,7 @@ async function handleCommitSelect(interaction: any): Promise<void> {
         if (allFiles && allFiles.length > 0) {
             let fileList = '';
             let filesShown = 0;
-            
+
             for (let i = 0; i < allFiles.length; i++) {
                 const testList = fileList + (fileList ? '\n' : '') + allFiles[i].filename;
                 if (testList.length > 950) {
@@ -327,8 +326,8 @@ async function handleFileSelect(interaction: any): Promise<void> {
                         .join('\n')
                         .trim();
 
-                    return { 
-                        filename: file.filename, 
+                    return {
+                        filename: file.filename,
                         patch: cleanPatch,
                         additions: file.additions || 0,
                         deletions: file.deletions || 0
@@ -365,8 +364,8 @@ async function handleFileSelect(interaction: any): Promise<void> {
                 const cleanPatch = file.patch.trim();
                 const additions = (file.patch.match(/^\+/gm) || []).length - 1;
                 const deletions = (file.patch.match(/^\-/gm) || []).length - 1;
-                return { 
-                    filename: file.filename, 
+                return {
+                    filename: file.filename,
                     patch: cleanPatch,
                     additions: Math.max(0, additions),
                     deletions: Math.max(0, deletions)

@@ -4,7 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "url";
 import { config } from "../config";
 
-export async function handleCommands(client: Client, commandsPath: string) {
+export default async function handleCommands(client: Client, commandsPath: string) {
   client.commands = new Collection();
   const commandFolders = fs.readdirSync(commandsPath);
   const commandArray: any[] = [];

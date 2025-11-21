@@ -1,8 +1,8 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { config, loadStartOptions } from "./config";
 import path from "path";
-import { handleCommands } from "./functions/handleCommands";
-import { handleEvents } from "./functions/handleEvents";
+import handleCommands from "./functions/handleCommands";
+import handleEvents from "./functions/handleEvents";
 import { execSync } from "child_process";
 import { gitPull, npmInstall } from "../startOptions.json";
 
