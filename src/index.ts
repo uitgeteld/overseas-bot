@@ -4,7 +4,6 @@ import path from "path";
 import handleCommands from "./functions/handleCommands";
 import handleEvents from "./functions/handleEvents";
 import { execSync } from "child_process";
-import { gitPull, npmInstall } from "../startOptions.json";
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
@@ -31,7 +30,7 @@ try {
         console.log('Files changed:');
         console.log(diffStat);
 
-        if (gitPull) {
+        if (client.startOptions.gitPull) {
             try {
                 console.log('Pulling latest changes from GitHub...');
                 execSync('git pull origin main', { stdio: 'inherit' });
@@ -49,11 +48,10 @@ try {
 }
 
 
-if (npmInstall) {
+if (client.startOptions.npmInstall) {
     try {
         console.log('Installing dependencies...');
-        execSync('npm install --omit=dev', { stdio: 'inherit' });
-        // execSync('npm install -D tsx', { stdio: 'inherit' });
+        execSync('npm install', { stdio: 'inherit' });
         console.log('Dependencies installed!\n');
     } catch (error) {
         console.log(`Error installing dependencies ${error}\n`);
