@@ -2,6 +2,7 @@ import { Client, Collection, REST, Routes } from "discord.js";
 import fs from "node:fs";
 import path from "node:path";
 import { config } from "../config";
+import { loadModule } from "../helpers/loadModule";
 
 export default async function handleCommands(client: Client, commandsPath: string) {
   client.commands = new Collection();
@@ -12,7 +13,8 @@ export default async function handleCommands(client: Client, commandsPath: strin
     const folderPath = path.join(commandsPath, folder);
     const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of commandFiles) {
-      const commandModule = await import(path.join(folderPath, file));
+      const filePath = path.join(folderPath, file);
+      const commandModule = await loadModule(filePath);
       const command = commandModule.default || commandModule;
       client.commands.set(command.data.name, command);
       commandArray.push(command.data.toJSON());
