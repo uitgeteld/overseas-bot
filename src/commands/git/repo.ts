@@ -30,7 +30,6 @@ export default {
                         });
                     }
                 }
-
                 const [owner, repoName] = repo.split('/');
 
                 if (!repoName) {
@@ -42,11 +41,10 @@ export default {
                             flags: MessageFlags.Ephemeral
                         });
                     }
-
                     const userData = await userResponse.json();
-
                     const reposResponse = await fetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=30`);
                     const repos = await reposResponse.json();
+                    const fields = [];
 
                     const embed = new EmbedBuilder()
                         .setColor('#C9C2B2')
@@ -55,7 +53,6 @@ export default {
                         .setThumbnail(userData.avatar_url)
                         .setDescription(userData.bio || 'No bio available');
 
-                    const fields = [];
                     if (userData.location) fields.push({ name: '📍 Location', value: userData.location, inline: true });
                     if (userData.company) fields.push({ name: '🏢 Company', value: userData.company, inline: true });
                     if (userData.blog) fields.push({ name: '🔗 Website', value: userData.blog, inline: true });
@@ -84,18 +81,16 @@ export default {
                             inline: false
                         });
                     }
-
                     embed.setTimestamp();
                     return await interaction.reply({ embeds: [embed] });
                 }
-
                 const readmeResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
                     headers: {
                         'Accept': 'application/vnd.github.v3.raw'
                     }
                 });
-
                 let readmeContent = '';
+
                 if (readmeResponse.ok) {
                     const readme = await readmeResponse.text();
                     readmeContent = formatMarkdownForDiscord(readme);
@@ -110,16 +105,15 @@ export default {
                     .setURL(`https://github.com/${owner}/${repoName}`)
                     .setDescription(readmeContent)
                     .setTimestamp();
-
                 await interaction.reply({ embeds: [embed] });
-
             } else {
                 let readmeContent = 'No README found in the repository.';
+
                 try {
                     const fs = require('fs');
                     const path = require('path');
-
                     const readmeFiles = ['README.md', 'readme.md', 'README.MD', 'README.txt', 'README'];
+
                     for (const filename of readmeFiles) {
                         const readmePath = path.join(process.cwd(), filename);
                         if (fs.existsSync(readmePath)) {
@@ -132,7 +126,6 @@ export default {
                 } catch (error) {
                     readmeContent = 'Could not read README file.';
                 }
-
                 const embed = new EmbedBuilder()
                     .setColor('#C9C2B2')
                     .setTitle('📦 Local Repository')

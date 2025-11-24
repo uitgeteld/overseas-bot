@@ -5,7 +5,6 @@ interface Categories {
 const categories: Categories = {
     util: '🔧 Utility',
     git: ' 🐈‍⬛ Git',
-    moderation: '🛡️ Moderation',
 };
 
 export const categorizer = {

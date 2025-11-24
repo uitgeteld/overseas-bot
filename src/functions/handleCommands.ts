@@ -20,8 +20,8 @@ export default async function handleCommands(client: Client, commandsPath: strin
       commandArray.push(command.data.toJSON());
     }
   }
-
   const rest = new REST({ version: "10" }).setToken(config.TOKEN);
+  
   try {
     console.log("Started refreshing application (/) commands.");
     await rest.put(

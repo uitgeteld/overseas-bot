@@ -32,7 +32,6 @@ export default {
                         .setLabel('Toggle Npm Install')
                         .setStyle(client.startOptions.npmInstall ? ButtonStyle.Danger : ButtonStyle.Success)
                 );
-
             return await interaction.update({ embeds: [embed], components: [row.toJSON()] });
         }
 
@@ -59,7 +58,6 @@ export default {
                         .setLabel('Toggle Npm Install')
                         .setStyle(client.startOptions.npmInstall ? ButtonStyle.Danger : ButtonStyle.Success)
                 );
-
             return await interaction.update({ embeds: [embed], components: [row.toJSON()] });
         }
     }
