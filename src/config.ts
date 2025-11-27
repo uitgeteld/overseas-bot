@@ -1,6 +1,9 @@
+dotenv.config();
+
 import * as fs from "fs";
 import * as path from "path";
 import { Client } from "discord.js";
+import dotenv from "dotenv";
 
 export function loadStartOptions(client: Client) {
   const optionsPath = path.join(__dirname, "../startOptions.json");
@@ -15,9 +18,6 @@ export function loadStartOptions(client: Client) {
     };
   }
 }
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const { TOKEN, CLIENT_ID, GITHUB_TOKEN } = process.env;
 
