@@ -29,6 +29,9 @@ export default {
                 }).join('\n');
                 embed.addFields({ name: 'Options', value: optionsDescription });
             }
+            if (command.aliases && Array.isArray(command.aliases) && command.aliases.length > 0) {
+                embed.addFields({ name: 'Aliases', value: command.aliases.map((alias: string) => `\`/${alias}\``).join(', ') });
+            }
             return await interaction.reply({ embeds: [embed] });
         }
         const embed = new EmbedBuilder()
@@ -47,8 +50,11 @@ export default {
             const commandList = Array.from(client.commands.values())
                 .filter(cmd => {
                     const cmdPath = path.join(commandsPath, folder, `${cmd.data.name}.ts`);
-                    if (cmd.devOnly) return;
+                    if (cmd.devOnly) return false;
                     return fs.existsSync(cmdPath);
+                })
+                .filter((cmd, index, self) => {
+                    return self.findIndex(c => c.data.name === cmd.data.name) === index;
                 })
                 .map(cmd => `\`/${cmd.data.name}\``)
                 .join(', ') || false;

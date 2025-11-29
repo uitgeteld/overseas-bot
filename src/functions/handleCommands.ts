@@ -16,8 +16,25 @@ export default async function handleCommands(client: Client, commandsPath: strin
       const filePath = path.join(folderPath, file);
       const commandModule = await loadModule(filePath);
       const command = commandModule.default || commandModule;
+      
       client.commands.set(command.data.name, command);
       commandArray.push(command.data.toJSON());
+      
+      if (command.aliases && Array.isArray(command.aliases)) {
+        for (const alias of command.aliases) {
+          const aliasData = new (command.data.constructor)()
+            .setName(alias)
+            .setDescription(`Alias for /${command.data.name}`);
+          if (command.data.options) {
+            command.data.options.forEach((option: any) => {
+              aliasData.options.push(option);
+            });
+          }
+          
+          client.commands.set(alias, command);
+          commandArray.push(aliasData.toJSON());
+        }
+      }
     }
   }
   const rest = new REST({ version: "10" }).setToken(config.TOKEN);
