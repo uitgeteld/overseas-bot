@@ -1,0 +1,5 @@
+// ** Todos** //
+Auto-welcome new members
+Simple moderation commands
+Show user info
+Suggestions system
