@@ -1,18 +1,18 @@
 
-import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder, MessageFlags } from "discord.js";
 
 export default {
     data: new SlashCommandBuilder()
         .setName('userinfo')
         .setDescription('Replies with user information')
         .addUserOption(option =>
-            option.setName('target')
+            option.setName('user')
                 .setDescription('The user to get information about')
                 .setRequired(false)),
     aliases: ['ui'],
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
-        await interaction.deferReply();
-        const user = interaction.options.getUser('target') || interaction.user;
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        const user = interaction.options.getUser('user') || interaction.user;
         const member = interaction.guild?.members.cache.get(user.id);
         const fullUser = await client.users.fetch(user.id, { force: true });
 

@@ -7,16 +7,15 @@ export default async function handleEvents(client: Client, eventsPath: string) {
   const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith(".ts") || file.endsWith(".js"));
   
   for (const file of eventFiles) {
-    console.log(`Loading event file: ${file}`);
     const filePath = path.join(eventsPath, file);
     const event = await loadModule(filePath);
     const evt = event.default || event;
 
     if (evt.once) {
-      console.log(`Registering one-time event: ${evt.name}`);
+      console.log(`Registering one-time event: ${evt.name} | ${file}`);
       client.once(evt.name, (...args: any[]) => evt.execute(...args, client));
     } else {
-      console.log(`Registering recurring event: ${evt.name}`);
+      console.log(`Registering recurring event: ${evt.name} | ${file}`);
       client.on(evt.name, (...args: any[]) => evt.execute(...args, client));
     }
   }

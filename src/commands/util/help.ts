@@ -12,6 +12,7 @@ export default {
                 .setDescription('The command to get help for')
                 .setRequired(false)),
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const commandName = interaction.options.getString('command');
 
         if (commandName) {
@@ -32,7 +33,7 @@ export default {
             if (command.aliases && Array.isArray(command.aliases) && command.aliases.length > 0) {
                 embed.addFields({ name: 'Aliases', value: command.aliases.map((alias: string) => `\`/${alias}\``).join(', ') });
             }
-            return await interaction.reply({ embeds: [embed] });
+            return await interaction.editReply({ embeds: [embed] });
         }
         const embed = new EmbedBuilder()
             .setColor('#C9C2B2')
@@ -62,6 +63,6 @@ export default {
                 embed.addFields({ name: category, value: commandList });
             }
         }
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     }
 };
