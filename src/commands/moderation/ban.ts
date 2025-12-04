@@ -2,17 +2,17 @@ import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, 
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('kick')
-        .setDescription('Kicks a member from the server')
+        .setName('ban')
+        .setDescription('Bans a member from the server')
         .addUserOption(option =>
             option.setName('member')
-                .setDescription('Select the member to kick')
+                .setDescription('Select the member to ban')
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('reason')
-                .setDescription('Reason for kicking the member')
+                .setDescription('Reason for banning the member')
                 .setRequired(false))
-        .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
     async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
 
@@ -24,18 +24,18 @@ export default {
             if (!member) {
                 return await interaction.editReply({ content: 'Member not found in the server.' });
             }
-            if (!member.kickable) {
+            if (!member.bannable) {
                 return await interaction.editReply({ content: 'I cannot kick this member. They might have higher permissions than me.' });
             }
-            await member.kick(reason);
+            await member.ban({ reason });
 
             const embed = new EmbedBuilder()
-                .setDescription(`👞 | **Kicked ${target?.username} for ${reason}**`)
+                .setDescription(`👞 | **Banned ${target?.username} for ${reason}**`)
                 .setColor("#C9C2B2");
             return await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             const embed = new EmbedBuilder()
-                .setDescription(`❌ | **Failed to kick ${target?.username}.**`)
+                .setDescription(`❌ | **Failed to ban ${target?.username}.**`)
                 .setColor("#C9C2B2");
             return await interaction.editReply({ embeds: [embed] });
         }
