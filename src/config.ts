@@ -1,9 +1,9 @@
-dotenv.config();
-
 import * as fs from "fs";
 import * as path from "path";
 import { Client } from "discord.js";
 import dotenv from "dotenv";
+
+dotenv.config();
 
 export function loadStartOptions(client: Client) {
   const optionsPath = path.join(__dirname, "../startOptions.json");
@@ -13,8 +13,7 @@ export function loadStartOptions(client: Client) {
   } catch (error) {
     console.log("No startOptions.json found, using defaults");
     client.startOptions = {
-      gitPull: true,
-      npmInstall: true,
+      gitPull: true
     };
   }
 }

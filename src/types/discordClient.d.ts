@@ -13,7 +13,6 @@ declare module "discord.js" {
     commands: Collection<string, Command>;
     startOptions: {
         gitPull: boolean;
-        npmInstall: boolean;
     }
   }
 }

@@ -47,17 +47,6 @@ try {
     console.log(`Could not check for updates ${error}\n`);
 }
 
-
-if (client.startOptions.npmInstall) {
-    try {
-        console.log('Installing dependencies...');
-        execSync('npm install', { stdio: 'inherit' });
-        console.log('Dependencies installed!\n');
-    } catch (error) {
-        console.log(`Error installing dependencies ${error}\n`);
-    }
-}
-
 const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);
 console.log(`Setup completed in ${setupTime}s\n\n`);
 
