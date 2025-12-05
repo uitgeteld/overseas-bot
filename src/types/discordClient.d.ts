@@ -4,6 +4,7 @@ export interface Command {
   data: any;
   execute: (...args: any[]) => any;
   devOnly?: boolean;
+  guildOnly?: boolean;
   aliases?: string[];
 }
 

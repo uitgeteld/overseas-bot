@@ -17,6 +17,11 @@ export default {
               flags: MessageFlags.Ephemeral
             });
           }
+        } else if (command.guildOnly && !interaction.guild) {
+          return await interaction.reply({
+            content: 'This command can only be used in a server.',
+            flags: MessageFlags.Ephemeral
+          });
         }
         await command.execute(interaction, client);
       } catch (error) {

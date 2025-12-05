@@ -19,14 +19,15 @@ function saveOptions(options: any) {
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('welcomechannel')
-        .setDescription('Set the welcome channel for the server')
+        .setName('goodbyechannel')
+        .setDescription('Set the goodbye channel for the server')
         .addChannelOption(option =>
             option.setName('channel')
-                .setDescription('The channel to set as the welcome channel')
+                .setDescription('The channel to set as the goodbye channel')
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-    aliases: ['wc'],
+    aliases: ['gc'],
+    guildOnly: true,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply({ ephemeral: true });
 
@@ -39,12 +40,12 @@ export default {
             options[guildId!] = {};
         }
 
-        options[guildId!].welcomeChannel = channel?.id;
+        options[guildId!].goodbyeChannel = channel?.id;
         saveOptions(options);
 
         const embed = new EmbedBuilder()
-            .setTitle('Welcome Channel Set')
-            .setDescription(`Welcome channel has been set to ${channel}`)
+            .setTitle('Goodbye Channel Set')
+            .setDescription(`Goodbye channel has been set to ${channel}`)
             .setColor('#C9C2B2')
             .setTimestamp();
 

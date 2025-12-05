@@ -13,6 +13,7 @@ export default {
                 .setDescription('Reason for banning the member')
                 .setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+        guildOnly: true,
     async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
 
