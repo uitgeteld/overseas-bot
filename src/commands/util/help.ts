@@ -13,26 +13,32 @@ export default {
                 .setRequired(false)),
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const commandName = interaction.options.getString('command');
 
         if (commandName) {
             const command = client.commands.get(commandName);
+
             if (!command) {
                 return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
             }
+
             const embed = new EmbedBuilder()
                 .setColor('#C9C2B2')
                 .setTitle(`Command: /${commandName}`)
                 .setDescription(command.data.description || 'No description available.')
+
             if (Array.isArray(command.data.options) && command.data.options.length > 0) {
                 const optionsDescription = command.data.options.map((option: { name: string; description?: string }) => {
                     return `\`-${option.name}\`: ${option.description || 'No description'}`;
                 }).join('\n');
+
                 embed.addFields({ name: 'Options', value: optionsDescription });
             }
             if (command.aliases && Array.isArray(command.aliases) && command.aliases.length > 0) {
                 embed.addFields({ name: 'Aliases', value: command.aliases.map((alias: string) => `\`/${alias}\``).join(', ') });
             }
+
             return await interaction.editReply({ embeds: [embed] });
         }
         const embed = new EmbedBuilder()
@@ -40,7 +46,6 @@ export default {
             .setTitle('📚 Bot Commands')
             .setDescription('Here are all the available commands organized by category:')
             .setFooter({ text: 'Use /help <command> to get info on a specific command.' });
-
         const commandsPath = path.join(__dirname, '..');
         const commandFolders = fs.readdirSync(commandsPath).filter(file => {
             return fs.statSync(path.join(commandsPath, file)).isDirectory();
@@ -59,6 +64,7 @@ export default {
                 })
                 .map(cmd => `\`/${cmd.data.name}\``)
                 .join(', ') || false;
+                
             if (commandList) {
                 embed.addFields({ name: category, value: commandList });
             }

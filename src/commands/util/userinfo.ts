@@ -12,6 +12,7 @@ export default {
     aliases: ['ui'],
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const user = interaction.options.getUser('user') || interaction.user;
         const member = interaction.guild?.members.cache.get(user.id);
         const fullUser = await client.users.fetch(user.id, { force: true });

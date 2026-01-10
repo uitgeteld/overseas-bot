@@ -9,9 +9,8 @@ export default {
         const embed = new EmbedBuilder()
             .setColor('#C9C2B2')
             .setTitle('⚙️ Start Options')
-            .setFields(
-                { name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true });
-                
+            .setFields({ name: '🐈‍⬛ Git Pull', value: client.startOptions?.gitPull ? 'Enabled' : 'Disabled', inline: true });
+
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
@@ -19,6 +18,7 @@ export default {
                     .setLabel('Toggle Git Pull')
                     .setStyle(client.startOptions?.gitPull ? ButtonStyle.Danger : ButtonStyle.Success)
             );
+            
         return await interaction.reply({
             embeds: [embed], components: [row.toJSON()], flags: MessageFlags.Ephemeral
         })

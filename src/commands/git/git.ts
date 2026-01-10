@@ -14,10 +14,10 @@ export default {
         try {
             let repo = interaction.options.getString('repo');
             let commits;
+            let match;
 
             if (repo) {
                 if (repo.includes('github.com') || repo.includes('git@github.com')) {
-                    let match;
                     match = repo.match(/github\.com[\/:]([^\/]+)\/([^\/\s\.]+)/);
 
                     if (!match) {
@@ -47,7 +47,6 @@ export default {
                     }
 
                     const userData = await userResponse.json();
-
                     const reposResponse = await githubFetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=25`);
                     const repos = await reposResponse.json();
 
@@ -81,6 +80,7 @@ export default {
                             );
 
                         const row = new ActionRowBuilder().addComponents(selectMenu);
+
                         return await interaction.reply({ embeds: [embed], components: [row.toJSON()] });
                     } else {
                         return await interaction.reply({ embeds: [embed] });
@@ -97,9 +97,11 @@ export default {
                 }
 
                 const githubCommits = await response.json();
+
                 commits = githubCommits.map((commit: any, index: number) => {
                     const date = new Date(commit.commit.author.date);
                     const relativeTime = getRelativeTime(date);
+
                     return {
                         id: index.toString(),
                         hash: commit.sha,
@@ -118,6 +120,7 @@ export default {
                 }
 
                 const commitLines = gitLog.trim().split('\n');
+
                 commits = commitLines.map((line, index) => {
                     const [hash, shortHash, author, date, message] = line.split('|');
                     return { id: index.toString(), hash, shortHash, author, date, message };
@@ -125,6 +128,7 @@ export default {
             }
 
             let embedUrl: string = '';
+
             if (repo) {
                 embedUrl = `https://github.com/${repo}`;
             } else {
@@ -168,6 +172,7 @@ export default {
                 );
 
             const row = new ActionRowBuilder().addComponents(selectMenu);
+
             await interaction.reply({ embeds: [embed], components: [row.toJSON()] });
 
         } catch (error) {
@@ -180,7 +185,6 @@ export default {
 function getRelativeTime(date: Date): string {
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
     const intervals = {
         year: 31536000,
         month: 2592000,

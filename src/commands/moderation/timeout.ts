@@ -33,16 +33,19 @@ export default {
             if (!member.moderatable) {
                 return await interaction.editReply({ content: 'I cannot timeout this member. They might have higher permissions than me.' });
             }
+
             await member.timeout(duration * 60 * 1000, reason);
 
             const embed = new EmbedBuilder()
                 .setDescription(`⏱️ | **Timed out ${target?.username} for ${duration} minutes. Reason: ${reason}**`)
                 .setColor("#C9C2B2");
+
             return await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             const embed = new EmbedBuilder()
                 .setDescription(`❌ | **Failed to timeout ${target?.username}.**`)
                 .setColor("#C9C2B2");
+                
             return await interaction.editReply({ embeds: [embed] });
         }
     }

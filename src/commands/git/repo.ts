@@ -11,10 +11,10 @@ export default {
     async execute(interaction: ChatInputCommandInteraction) {
         try {
             let repo = interaction.options.getString('repo');
+            let match;
 
             if (repo) {
                 if (repo.includes('github.com') || repo.includes('git@github.com')) {
-                    let match;
                     match = repo.match(/github\.com[\/:]([^\/]+)\/([^\/\s\.]+)/);
 
                     if (!match) {
@@ -30,6 +30,7 @@ export default {
                         });
                     }
                 }
+
                 const [owner, repoName] = repo.split('/');
 
                 if (!repoName) {
@@ -41,6 +42,7 @@ export default {
                             flags: MessageFlags.Ephemeral
                         });
                     }
+
                     const userData = await userResponse.json();
                     const reposResponse = await fetch(`https://api.github.com/users/${owner}/repos?sort=updated&per_page=30`);
                     const repos = await reposResponse.json();
@@ -56,6 +58,7 @@ export default {
                     if (userData.location) fields.push({ name: '📍 Location', value: userData.location, inline: true });
                     if (userData.company) fields.push({ name: '🏢 Company', value: userData.company, inline: true });
                     if (userData.blog) fields.push({ name: '🔗 Website', value: userData.blog, inline: true });
+
                     fields.push({ name: '📊 Public Repos', value: userData.public_repos.toString(), inline: true });
                     fields.push({ name: '👥 Followers', value: userData.followers.toString(), inline: true });
                     fields.push({ name: '⭐ Following', value: userData.following.toString(), inline: true });
@@ -71,6 +74,7 @@ export default {
                             .map((r: any) => {
                                 const stars = r.stargazers_count > 0 ? ` ⭐${r.stargazers_count}` : '';
                                 const desc = r.description ? ` - ${r.description.substring(0, 80)}` : '';
+
                                 return `[${r.name}](${r.html_url})${stars}${desc}`;
                             })
                             .join('\n');
@@ -81,7 +85,9 @@ export default {
                             inline: false
                         });
                     }
+
                     embed.setTimestamp();
+
                     return await interaction.reply({ embeds: [embed] });
                 }
                 const readmeResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
@@ -93,6 +99,7 @@ export default {
 
                 if (readmeResponse.ok) {
                     const readme = await readmeResponse.text();
+
                     readmeContent = formatMarkdownForDiscord(readme);
                     readmeContent = readmeContent.length > 4000 ? readmeContent.substring(0, 3997) + '...' : readmeContent;
                 } else {
@@ -105,6 +112,7 @@ export default {
                     .setURL(`https://github.com/${owner}/${repoName}`)
                     .setDescription(readmeContent)
                     .setTimestamp();
+
                 await interaction.reply({ embeds: [embed] });
             } else {
                 let readmeContent = 'No README found in the repository.';
@@ -116,6 +124,7 @@ export default {
 
                     for (const filename of readmeFiles) {
                         const readmePath = path.join(process.cwd(), filename);
+
                         if (fs.existsSync(readmePath)) {
                             const readme = fs.readFileSync(readmePath, 'utf-8');
                             readmeContent = formatMarkdownForDiscord(readme);
@@ -134,9 +143,9 @@ export default {
 
                 await interaction.reply({ embeds: [embed] });
             }
-
         } catch (error) {
             console.error(error);
+
             await interaction.reply({ content: 'Failed to fetch README.', flags: MessageFlags.Ephemeral });
         }
     }

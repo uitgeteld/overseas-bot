@@ -33,7 +33,6 @@ export default {
 
         const channel = interaction.options.getChannel('channel');
         const guildId = interaction.guild?.id;
-
         const options = loadOptions();
 
         if (!options[guildId!]) {
@@ -41,6 +40,7 @@ export default {
         }
 
         options[guildId!].goodbyeChannel = channel?.id;
+        
         saveOptions(options);
 
         const embed = new EmbedBuilder()

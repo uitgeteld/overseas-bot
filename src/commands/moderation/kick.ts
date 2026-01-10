@@ -28,16 +28,19 @@ export default {
             if (!member.kickable) {
                 return await interaction.editReply({ content: 'I cannot kick this member. They might have higher permissions than me.' });
             }
+
             await member.kick(reason);
 
             const embed = new EmbedBuilder()
                 .setDescription(`👞 | **Kicked ${target?.username} for ${reason}**`)
                 .setColor("#C9C2B2");
+
             return await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             const embed = new EmbedBuilder()
                 .setDescription(`❌ | **Failed to kick ${target?.username}.**`)
                 .setColor("#C9C2B2");
+                
             return await interaction.editReply({ embeds: [embed] });
         }
     }

@@ -23,9 +23,11 @@ export default {
 
         try {
             client.emit(eventName, param1, param2);
+
             return await interaction.editReply(`✅ Successfully emitted event: **${eventName}**`);
         } catch (error) {
             console.error(`Error emitting event ${eventName}:`, error);
+            
             return await interaction.editReply(`❌ Failed to emit event: **${eventName}** ${error}`);
         }
     }
