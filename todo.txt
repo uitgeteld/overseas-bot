@@ -1,5 +1,4 @@
 // ** Todos** //
-Auto-welcome new members
 Suggestions system
 Ticket system
-Reaction Roles
+Json -> mysql/sqlite

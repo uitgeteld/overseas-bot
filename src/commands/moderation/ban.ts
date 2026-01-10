@@ -26,7 +26,7 @@ export default {
                 return await interaction.editReply({ content: 'Member not found in the server.' });
             }
             if (!member.bannable) {
-                return await interaction.editReply({ content: 'I cannot kick this member. They might have higher permissions than me.' });
+                return await interaction.editReply({ content: 'I cannot ban this member. They might have higher permissions than me.' });
             }
 
             await member.ban({ reason });
