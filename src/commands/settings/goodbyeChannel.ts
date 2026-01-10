@@ -2,21 +2,6 @@ import { SlashCommandBuilder, ChatInputCommandInteraction, Client, PermissionFla
 import fs from "node:fs";
 import path from "node:path";
 
-const OPTIONS_FILE = path.join(__dirname, '../../..', 'options.json');
-
-function loadOptions() {
-    try {
-        const data = fs.readFileSync(OPTIONS_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return {};
-    }
-}
-
-function saveOptions(options: any) {
-    fs.writeFileSync(OPTIONS_FILE, JSON.stringify(options, null, 2));
-}
-
 export default {
     data: new SlashCommandBuilder()
         .setName('goodbyechannel')
@@ -40,7 +25,7 @@ export default {
         }
 
         options[guildId!].goodbyeChannel = channel?.id;
-        
+
         saveOptions(options);
 
         const embed = new EmbedBuilder()
@@ -52,3 +37,18 @@ export default {
         return interaction.editReply({ embeds: [embed] });
     }
 };
+
+const OPTIONS_FILE = path.join(__dirname, '../../..', 'options.json');
+
+function loadOptions() {
+    try {
+        const data = fs.readFileSync(OPTIONS_FILE, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        return {};
+    }
+}
+
+function saveOptions(options: any) {
+    fs.writeFileSync(OPTIONS_FILE, JSON.stringify(options, null, 2));
+}
