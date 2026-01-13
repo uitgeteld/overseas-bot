@@ -1,6 +1,4 @@
 // ** Todos** //
 Suggestions system
 Ticket system
-Json -> mysql/sqlite {
-    * Planned to remove commands (welcomeChannel & goodbyeChannel)
-}
+Json -> mysql/sqlite
