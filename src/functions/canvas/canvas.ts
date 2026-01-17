@@ -285,11 +285,11 @@ export class RankCard {
         ctx.closePath();
         ctx.stroke();
 
-        // Tekenen van doorschijnende schaduw
+        // Drawing translucent shadow
         ctx.beginPath();
         ctx.arc(110, 100, 75, 0, Math.PI * 2, true);
-        ctx.shadowColor = '#000000'; // Kleur van de schaduw
-        ctx.shadowBlur = 10; // Intensiteit van de schaduw
+        ctx.shadowColor = '#000000'; // Shadow color
+        ctx.shadowBlur = 0.3; // Shadow intensity
         ctx.closePath();
         ctx.stroke();
 
