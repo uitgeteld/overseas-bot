@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 
 export default {
     data: new SlashCommandBuilder()
@@ -13,30 +13,26 @@ export default {
         const member = interaction.guild?.members.cache.get(user.id);
 
         const avatarUrl = user.displayAvatarURL({ forceStatic: false, size: 1024 });
-        const serverAvatarUrl = member?.displayAvatarURL({ forceStatic: false, size: 1024 });
 
         const embed = new EmbedBuilder()
-            .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({ forceStatic: false }) })
+            .setAuthor({ name: user.tag, iconURL: avatarUrl })
             .setTitle(`${user.username}'s Avatar`)
             .setImage(avatarUrl)
             .setColor('#C9C2B2')
             .setTimestamp();
 
-        const links = [
-            `[PNG](${avatarUrl}?size=1024)`,
-            `[JPG](${avatarUrl.replace('.webp', '.jpg')}?size=1024)`
-        ];
+        const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+            .setLabel('PNG')
+            .setStyle(ButtonStyle.Link)
+            .setURL(`${avatarUrl}?size=1024`),
+            
+            new ButtonBuilder()
+            .setLabel('JPG')
+            .setStyle(ButtonStyle.Link)
+            .setURL(`${avatarUrl.replace('.webp', '.jpg')}?size=1024`),
+        );
 
-        if (serverAvatarUrl) {
-            embed.addFields({
-                name: 'Server Avatar',
-                value: `[View](${serverAvatarUrl}?size=1024)`,
-                inline: false
-            });
-        }
-
-        embed.setFooter({ text: `Download: ${links.join(' • ')}` });
-
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed], components: [buttons] });
     }
 };
