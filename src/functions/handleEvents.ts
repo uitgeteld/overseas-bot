@@ -6,12 +6,7 @@ import { loadModule } from "../helpers/loadModule";
 
 const folderColors: Record<string, (text: string) => string> = {
   guildMember: chalk.cyan,
-  message: chalk.green,
-  interaction: chalk.magenta,
-  voice: chalk.yellow,
-  channel: chalk.blue,
-  role: chalk.red,
-  default: chalk.white
+  git: chalk.green,
 };
 
 function getFolderColor(folder: string): (text: string) => string {
