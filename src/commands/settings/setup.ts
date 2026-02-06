@@ -17,43 +17,45 @@ export default {
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply({ ephemeral: true });
 
-        const welcomeChannel = interaction.options.getChannel('weclomechannel');
+        const welcomeChannel = interaction.options.getChannel('welcomechannel');
         const goodbyeChannel = interaction.options.getChannel('goodbyechannel');
         const guildId = interaction.guild?.id;
         const options = loadOptions();
 
         if (!options[guildId!]) options[guildId!] = {};
 
-        if (welcomeChannel) {
+        const selected = welcomeChannel ? 'welcomechannel' : goodbyeChannel ? 'goodbyechannel' : null;
 
-            options[guildId!].welcomeChannel = welcomeChannel?.id;
+        switch (selected) {
+            case 'welcomechannel':
+                options[guildId!].welcomeChannel = welcomeChannel!.id;
+                saveOptions(options);
+                return interaction.editReply({ embeds: [
+                    new EmbedBuilder()
+                        .setTitle('Welcome Channel Set')
+                        .setDescription(`Welcome channel has been set to ${welcomeChannel}`)
+                        .setColor('#C9C2B2')
+                        .setTimestamp()
+                ]});
 
-            saveOptions(options);
+            case 'goodbyechannel':
+                options[guildId!].goodbyeChannel = goodbyeChannel!.id;
+                saveOptions(options);
+                return interaction.editReply({ embeds: [
+                    new EmbedBuilder()
+                        .setTitle('Goodbye Channel Set')
+                        .setDescription(`Goodbye channel has been set to ${goodbyeChannel}`)
+                        .setColor('#C9C2B2')
+                        .setTimestamp()
+                ]});
 
-            const embed = new EmbedBuilder()
-                .setTitle('Goodbye Channel Set')
-                .setDescription(`Goodbye channel has been set to ${welcomeChannel}`)
-                .setColor('#C9C2B2')
-                .setTimestamp();
-
-            return interaction.editReply({ embeds: [embed] });
-        } else if (goodbyeChannel) {
-
-            options[guildId!].goodbyeChannel = goodbyeChannel?.id;
-
-            saveOptions(options);
-
-            const embed = new EmbedBuilder()
-                .setTitle('Goodbye Channel Set')
-                .setDescription(`Goodbye channel has been set to ${goodbyeChannel}`)
-                .setColor('#C9C2B2')
-                .setTimestamp();
-        } else {
-            const embed = new EmbedBuilder()
-                .setDescription("❌ | **Setup canceled**")
-                .setColor('#C9C2B2')
-                .setTimestamp();
-            return interaction.editReply({ embeds: [embed] });
+            default:
+                return interaction.editReply({ embeds: [
+                    new EmbedBuilder()
+                        .setDescription("❌ | **Setup canceled**")
+                        .setColor('#C9C2B2')
+                        .setTimestamp()
+                ]});
         }
     }
 };

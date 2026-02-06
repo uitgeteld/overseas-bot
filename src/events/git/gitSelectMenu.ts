@@ -1,6 +1,6 @@
 import { Interaction, Client, EmbedBuilder, MessageFlags, ActionRowBuilder, StringSelectMenuBuilder } from "discord.js";
 import { execSync } from "child_process";
-import githubFetch from "../helpers/githubFetcher";
+import githubFetch from "../../helpers/githubFetcher";
 
 export default {
     name: "interactionCreate",
