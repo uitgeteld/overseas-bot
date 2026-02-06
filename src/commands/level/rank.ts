@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, AttachmentBuilder } from "discord.js";
-import { RankCard } from "../../functions/canvas/canvas";
+import { RankCard } from "../../functions/image/canvas/canvas";
 
 export default {
     data: new SlashCommandBuilder()

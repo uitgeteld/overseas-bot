@@ -1,5 +1,5 @@
 import Canvas from '@napi-rs/canvas';
-import { Util } from '../../utils/util';
+import { Util } from '../../../utils/util';
 
 interface UsernameConfig {
     data: string;
