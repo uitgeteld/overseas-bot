@@ -1,4 +1,5 @@
 import { GuildMember, Client, EmbedBuilder } from "discord.js";
+import { once } from "node:cluster";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -15,6 +16,7 @@ function loadOptions() {
 
 export default {
     name: "guildMemberAdd",
+    once: false,
     async execute(member: GuildMember, client: Client) {
         const embed = new EmbedBuilder()
             .setColor("#C9C2B2")

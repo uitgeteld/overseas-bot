@@ -15,6 +15,7 @@ function loadOptions() {
 
 export default {
     name: "guildMemberRemove",
+    once: false,
     async execute(member: GuildMember, client: Client) {
         const embed = new EmbedBuilder()
             .setColor("#C9C2B2")
