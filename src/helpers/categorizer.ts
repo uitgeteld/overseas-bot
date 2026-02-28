@@ -6,6 +6,7 @@ const categories: Categories = {
     util: '🔧 Utility',
     git: ' 🐈‍⬛ Git',
     moderation: '🛡️ Moderation',
+    image: '🖼️ Image',
 };
 
 export const categorizer = {

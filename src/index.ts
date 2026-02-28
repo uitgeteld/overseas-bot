@@ -6,7 +6,12 @@ import handleEvents from "./functions/handleEvents";
 import { execSync } from "child_process";
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildPresences
+    ],
 }) as Client;
 
 loadStartOptions(client);

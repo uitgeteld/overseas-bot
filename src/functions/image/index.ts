@@ -1,3 +1,5 @@
+import { ImageColorExtractor } from './canvacore/imageColorExtractor'
+import { SpotifyCard } from './canvacore/spotifyCard'
 import brightness from './grainular/brightness';
 import grainular from './grainular/grain';
 import saturate from './grainular/saturate';
@@ -6,6 +8,11 @@ import greyscale from './greyscale.re/greyscale';
 import monochrome from './greyscale.re/monochrome';
 
 export {
+    // canvacore
+    ImageColorExtractor,
+    SpotifyCard,
+    
+
     // grainular
     brightness,
     grainular,
@@ -14,5 +21,5 @@ export {
     // greyscale.re
     grain,
     greyscale,
-    monochrome
+    monochrome,
 };
