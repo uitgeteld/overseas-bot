@@ -4,6 +4,7 @@ import path from "path";
 import handleCommands from "./functions/handleCommands";
 import handleEvents from "./functions/handleEvents";
 import { execSync } from "child_process";
+import "./utils/database";
 
 const client = new Client({
     intents: [
