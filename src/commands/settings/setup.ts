@@ -1,76 +1,151 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, Client, PermissionFlagsBits, EmbedBuilder } from "discord.js";
-import fs from "node:fs";
-import path from "node:path";
+import { SlashCommandBuilder, ChatInputCommandInteraction, Client, PermissionFlagsBits, EmbedBuilder, MessageFlags } from "discord.js";
+import { query, insert, update, remove } from "../../utils/database";
 
 export default {
     data: new SlashCommandBuilder()
         .setName('setup')
         .setDescription('Setup settings for the server')
-        .addChannelOption(option =>
-            option.setName('welcomechannel')
-                .setDescription('The channel to set as the weclome channel'))
-        .addChannelOption(option =>
-            option.setName('goodbyechannel')
-                .setDescription('The channel to set as the goodbye channel'))
+        .addSubcommand(subcommand =>
+            subcommand.setName("set")
+                .setDescription('Set welcome or goodbye channels')
+                .addChannelOption(option =>
+                    option.setName('welcomechannel')
+                        .setDescription('The channel where welcome messages will be sent')
+                )
+                .addChannelOption(option =>
+                    option.setName('goodbyechannel')
+                        .setDescription('The channel where goodbye messages will be sent')
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand.setName("remove")
+                .setDescription('Remove welcome or goodbye channels')
+                .addChannelOption(option =>
+                    option.setName('welcomechannel')
+                        .setDescription('Remove the welcome channel')
+                )
+                .addChannelOption(option =>
+                    option.setName('goodbyechannel')
+                        .setDescription('Remove the goodbye channel')
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand.setName("reset")
+                .setDescription('Reset all settings for the server')
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
     guildOnly: true,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
-        await interaction.deferReply({ ephemeral: true });
+        try {
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        } catch (err) {
+            console.error('deferReply failed for setup command:', {
+                id: interaction.id,
+                guildId: interaction.guild?.id,
+                replied: interaction.replied,
+                deferred: interaction.deferred,
+                error: err
+            });
+            try {
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ content: 'Processing...', flags: MessageFlags.Ephemeral });
+                }
+            } catch (replyErr) {
+                console.error('Fallback reply also failed for setup command:', replyErr);
+            }
+        }
 
+        const sub = interaction.options.getSubcommand();
         const welcomeChannel = interaction.options.getChannel('welcomechannel');
         const goodbyeChannel = interaction.options.getChannel('goodbyechannel');
         const guildId = interaction.guild?.id;
-        const options = loadOptions();
 
-        if (!options[guildId!]) options[guildId!] = {};
+        if (!guildId) {
+            return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder().setDescription('❌ | **Guild not found**').setColor('#C9C2B2')
+                ]
+            });
+        }
 
-        const selected = welcomeChannel ? 'welcomechannel' : goodbyeChannel ? 'goodbyechannel' : null;
+        const [settings] = await query('SELECT welcome_channel_id, goodbye_channel_id FROM guild_settings WHERE guild_id = ?', [guildId]);
 
-        switch (selected) {
-            case 'welcomechannel':
-                options[guildId!].welcomeChannel = welcomeChannel!.id;
-                saveOptions(options);
-                return interaction.editReply({ embeds: [
-                    new EmbedBuilder()
-                        .setTitle('Welcome Channel Set')
-                        .setDescription(`Welcome channel has been set to ${welcomeChannel}`)
-                        .setColor('#C9C2B2')
-                        .setTimestamp()
-                ]});
+        try {
+            if (sub === 'set') {
+                if (!welcomeChannel && !goodbyeChannel) {
+                    return interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder().setDescription('❌ | **No channel provided to set**').setColor('#C9C2B2')
+                        ]
+                    });
+                }
 
-            case 'goodbyechannel':
-                options[guildId!].goodbyeChannel = goodbyeChannel!.id;
-                saveOptions(options);
-                return interaction.editReply({ embeds: [
-                    new EmbedBuilder()
-                        .setTitle('Goodbye Channel Set')
-                        .setDescription(`Goodbye channel has been set to ${goodbyeChannel}`)
-                        .setColor('#C9C2B2')
-                        .setTimestamp()
-                ]});
+                if (welcomeChannel) {
+                    if (settings) {
+                        await update('UPDATE guild_settings SET welcome_channel_id = ? WHERE guild_id = ?', [welcomeChannel.id, guildId]);
+                    } else {
+                        await insert('INSERT INTO guild_settings (guild_id, welcome_channel_id) VALUES (?, ?)', [guildId, welcomeChannel.id]);
+                    }
+                }
 
-            default:
-                return interaction.editReply({ embeds: [
-                    new EmbedBuilder()
-                        .setDescription("❌ | **Setup canceled**")
-                        .setColor('#C9C2B2')
-                        .setTimestamp()
-                ]});
+                if (goodbyeChannel) {
+                    if (settings) {
+                        await update('UPDATE guild_settings SET goodbye_channel_id = ? WHERE guild_id = ?', [goodbyeChannel.id, guildId]);
+                    } else {
+                        await insert('INSERT INTO guild_settings (guild_id, goodbye_channel_id) VALUES (?, ?)', [guildId, goodbyeChannel.id]);
+                    }
+                }
+
+                return interaction.editReply({
+                    embeds: [
+                        new EmbedBuilder().setTitle('Settings updated').setDescription('Channel(s) saved.').setColor('#C9C2B2')
+                    ]
+                });
+            }
+
+            if (sub === 'remove') {
+                if (!welcomeChannel && !goodbyeChannel) {
+                    return interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder().setDescription('❌ | **No channel provided to remove**').setColor('#C9C2B2')
+                        ]
+                    });
+                }
+
+                if (welcomeChannel) {
+                    if (settings) {
+                        await update('UPDATE guild_settings SET welcome_channel_id = NULL WHERE guild_id = ?', [guildId]);
+                    }
+                }
+
+                if (goodbyeChannel) {
+                    if (settings) {
+                        await update('UPDATE guild_settings SET goodbye_channel_id = NULL WHERE guild_id = ?', [guildId]);
+                    }
+                }
+
+                return interaction.editReply({
+                    embeds: [
+                        new EmbedBuilder().setTitle('Settings updated').setDescription('Channel(s) removed.').setColor('#C9C2B2')
+                    ]
+                });
+            }
+
+            if (sub === 'reset') {
+                await remove('DELETE FROM guild_settings WHERE guild_id = ?', [guildId]);
+                return interaction.editReply({
+                    embeds: [
+                        new EmbedBuilder().setTitle('Settings reset').setDescription('All settings for this server have been cleared.').setColor('#C9C2B2')
+                    ]
+                });
+            }
+        } catch (error) {
+            console.error(`Error in setup command: ${error}`);
+            return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder().setDescription('❌ | **An error occurred during setup**').setColor('#C9C2B2')
+                ]
+            });
         }
     }
 };
-
-const OPTIONS_FILE = path.join(__dirname, '../../..', 'options.json');
-
-function loadOptions() {
-    try {
-        const data = fs.readFileSync(OPTIONS_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return {};
-    }
-}
-
-function saveOptions(options: any) {
-    fs.writeFileSync(OPTIONS_FILE, JSON.stringify(options, null, 2));
-}
