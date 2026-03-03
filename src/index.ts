@@ -4,7 +4,7 @@ import path from "path";
 import handleCommands from "./functions/handleCommands";
 import handleEvents from "./functions/handleEvents";
 import { execSync } from "child_process";
-import "./utils/database";
+import { instance as initializeDatabase } from "./utils/database";
 
 const client = new Client({
     intents: [
@@ -57,6 +57,7 @@ const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);
 console.log(`Setup completed in ${setupTime}s\n\n`);
 
 (async () => {
+    await initializeDatabase();
     await handleCommands(client, commandsPath);
     handleEvents(client, eventsPath);
     client.login(config.TOKEN);
