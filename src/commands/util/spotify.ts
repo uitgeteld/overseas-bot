@@ -17,7 +17,6 @@ export default {
         const user = interaction.options.getUser('user') || interaction.user;
         const member = interaction.guild?.members.cache.get(user.id);
 
-        console.log(member?.presence)
         if (isPlayingSpotify(member?.presence)) {
             const spotifyActivity = isPlayingSpotify(member?.presence);
             if(spotifyActivity.state == null) return await interaction.editReply('This user is not listening to music on Spotify.');
