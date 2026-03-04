@@ -3,10 +3,12 @@ interface Categories {
 }
 
 const categories: Categories = {
-    util: '🔧 Utility',
     git: ' 🐈‍⬛ Git',
-    moderation: '🛡️ Moderation',
     image: '🖼️ Image',
+    moderation: '🛡️ Moderation',
+    settings: '⚙️ Settings',
+    tickets: '🎫 Tickets',
+    util: '🔧 Utility',
 };
 
 export const categorizer = {
