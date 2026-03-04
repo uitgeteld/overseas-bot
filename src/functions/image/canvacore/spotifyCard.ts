@@ -128,7 +128,7 @@ class SpotifyCard {
      * Creating the MusicCard
      */
     async build(): Promise<Buffer | undefined> {
-        const width: number = 800;
+        const width: number = 900;
         const height: number = 440;
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext("2d");
@@ -163,7 +163,7 @@ class SpotifyCard {
         ctx.fillText(`Album: ${this.album}`, 50, 320);
 
         // Draw Progress Bar
-        const barWidth: number = 700;
+        const barWidth: number = canvas.width - 100;
         const barHeight: number = 20;
         const barX: number = 50;
         const barY: number = 350;
