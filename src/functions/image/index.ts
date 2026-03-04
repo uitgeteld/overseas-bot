@@ -1,5 +1,6 @@
 import { ImageColorExtractor } from './canvacore/imageColorExtractor'
 import { SpotifyCard } from './canvacore/spotifyCard'
+import { MusicCard } from './canvacore/musicCard'
 import brightness from './grainular/brightness';
 import grainular from './grainular/grain';
 import saturate from './grainular/saturate';
@@ -11,6 +12,7 @@ export {
     // canvacore
     ImageColorExtractor,
     SpotifyCard,
+    MusicCard,
     
 
     // grainular
