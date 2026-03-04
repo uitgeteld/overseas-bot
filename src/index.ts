@@ -59,6 +59,6 @@ console.log(`Setup completed in ${setupTime}s\n\n`);
 (async () => {
     await initializeDatabase();
     await handleCommands(client, commandsPath);
-    handleEvents(client, eventsPath);
+    await handleEvents(client, eventsPath);
     client.login(config.TOKEN);
 })();

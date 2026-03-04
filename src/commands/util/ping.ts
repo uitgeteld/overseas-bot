@@ -1,4 +1,3 @@
-
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 
 export default {
@@ -7,7 +6,7 @@ export default {
         .setDescription('Replies with Pong!'),
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         const start = Date.now();
-        
+
         await interaction.deferReply();
 
         const embed = new EmbedBuilder()
