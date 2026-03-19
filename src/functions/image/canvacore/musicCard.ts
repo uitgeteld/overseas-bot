@@ -29,8 +29,8 @@ class MusicCard {
         this.artist = '';
         this.album = '';
         this.cover = '';
-        this.songStart = 0;
-        this.songDuration = 0;
+        this.songStart = 50;
+        this.songDuration = 200;
         this.color = {
             background: {
                 type: ['color', 'image'][0],
@@ -38,8 +38,8 @@ class MusicCard {
             },
             border: '#111111',
             bar: {
-                color: '#FFFFFF',
-                background: '#555555'
+                color: '#1DB954',
+                background: '#555555bb'
             }
         };
     }
@@ -139,16 +139,25 @@ class MusicCard {
             throw new TypeError('Failed to load cover image. Please make sure the URL is correct and points to an image.');
         }
 
+        const barWidth: number = canvas.width - 120;
+        const barHeight: number = 20;
+        const barX: number = 60;
+        const barY: number = canvas.height - 80;
+        const progressPercent: number = this.songStart / this.songDuration;
+
+        // Background of the progress bar
+        ctx.fillStyle = `${this.color.bar.background}`;
+        ctx.fillRect(barX, barY, barWidth, barHeight);
+
+        // Foreground of the progress bar
+        ctx.fillStyle = `${this.color.bar.color}`;
+        ctx.fillRect(barX, barY, barWidth * progressPercent, barHeight);
+
+
         try {
             return await canvas.toBuffer('image/png');
         } catch (error) {
             throw new Error('Failed to generate MusicCard image.');
-        }
-
-        function formatTime(seconds: number): string {
-            const minutes: number = Math.floor(seconds / 60);
-            const remainingSeconds: number = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
         }
     }
 }
