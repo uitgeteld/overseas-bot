@@ -1,9 +1,9 @@
-import { createCanvas, GlobalFonts } from '@napi-rs/canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 interface ColorConfig {
     background: {
-        color: string;
-        image: string;
+        type: string;
+        data: string;
     }
     border: string;
     bar: {
@@ -33,8 +33,8 @@ class MusicCard {
         this.songDuration = 0;
         this.color = {
             background: {
-                color: '#1F1F1F',
-                image: ''
+                type: ['color', 'image'][0],
+                data: '#1F1F1F',
             },
             border: '#111111',
             bar: {
@@ -106,8 +106,22 @@ class MusicCard {
         const ctx = canvas.getContext("2d");
 
         // Background
-        ctx.fillStyle = this.color.background.image != "" ? this.color.background.image : this.color.background.color;
-        ctx.fillRect(0, 0, width, height);
+        switch (this.color.background.type) {
+            case 'color':
+                ctx.fillStyle = this.color.background.data;
+                ctx.fillRect(0, 0, width, height);
+                break;
+            case 'image':
+                try {
+                    const backgroundImage = await loadImage(this.color.background.data);
+                    ctx.drawImage(backgroundImage, 0, 0, width, height);
+                } catch (error) {
+                    throw new TypeError('Failed to load background image. Please make sure the URL is correct and points to an image.');
+                }
+                break;
+            default:
+                throw new Error('Invalid background type. Type must be either "color" or "image".');
+        }
 
         // Border
         ctx.strokeStyle = this.color.border;
@@ -117,10 +131,18 @@ class MusicCard {
         ctx.roundRect(0, 0, width, height, radius);
         ctx.stroke();
 
+        // Cover
+        try {
+            const coverImage = await loadImage(this.cover);
+            ctx.drawImage(coverImage, 60, 60, 200, 200);
+        } catch (error) {
+            throw new TypeError('Failed to load cover image. Please make sure the URL is correct and points to an image.');
+        }
+
         try {
             return await canvas.toBuffer('image/png');
         } catch (error) {
-            console.log(error);
+            throw new Error('Failed to generate MusicCard image.');
         }
 
         function formatTime(seconds: number): string {

@@ -10,6 +10,7 @@ export default {
         await interaction.deferReply();
 
         const card = await new MusicCard()
+        .setCover("https://i1.sndcdn.com/artworks-JuQBMQKuKlvbbcPh-qKVRTQ-t1080x1080.png")
         .build()
         const attachment = new AttachmentBuilder(card!, { name: 'musicCard.png' });
         interaction.editReply({
