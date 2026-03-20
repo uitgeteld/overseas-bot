@@ -1,4 +1,4 @@
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { createCanvas, loadImage, CanvasRenderingContext2D } from '@napi-rs/canvas';
 
 interface ColorConfig {
     background: {
@@ -29,7 +29,7 @@ class MusicCard {
         this.artist = '';
         this.album = '';
         this.cover = '';
-        this.songStart = 50;
+        this.songStart = 201;
         this.songDuration = 200;
         this.color = {
             background: {
@@ -126,7 +126,7 @@ class MusicCard {
         // Border
         ctx.strokeStyle = this.color.border;
         ctx.lineWidth = 40;
-        const radius = 45;
+        var radius = 45;
         ctx.beginPath();
         ctx.roundRect(0, 0, width, height, radius);
         ctx.stroke();
@@ -143,22 +143,38 @@ class MusicCard {
         const barHeight: number = 20;
         const barX: number = 60;
         const barY: number = canvas.height - 80;
-        const progressPercent: number = this.songStart / this.songDuration;
+        const progressPercent: number = this.songStart >= this.songDuration ? 1 : this.songStart / this.songDuration;
+        var radius = 10;
 
         // Background of the progress bar
-        ctx.fillStyle = `${this.color.bar.background}`;
-        ctx.fillRect(barX, barY, barWidth, barHeight);
+        this.drawRounded(ctx, barX, barY, barWidth, barHeight, radius, this.color.bar.background);
 
         // Foreground of the progress bar
-        ctx.fillStyle = `${this.color.bar.color}`;
-        ctx.fillRect(barX, barY, barWidth * progressPercent, barHeight);
-
+        this.drawRounded(ctx, barX, barY, barWidth * progressPercent, barHeight, radius, this.color.bar.color);
 
         try {
             return await canvas.toBuffer('image/png');
         } catch (error) {
             throw new Error('Failed to generate MusicCard image.');
         }
+    }
+
+    private drawRounded(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fillStyle: string, isProgressBar: boolean = false): void {
+        const r = Math.min(radius, width / 2, height / 2);
+
+        ctx.fillStyle = fillStyle;
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + width - r, y);
+        ctx.arcTo(x + width, y, x + width, y + r, r);
+        ctx.lineTo(x + width, y + height - r);
+        ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
+        ctx.lineTo(x + r, y + height);
+        ctx.arcTo(x, y + height, x, y + height - r, r);
+        ctx.lineTo(x, y + r);
+        ctx.arcTo(x, y, x + r, y, r);
+        ctx.closePath();
+        ctx.fill();
     }
 }
 
