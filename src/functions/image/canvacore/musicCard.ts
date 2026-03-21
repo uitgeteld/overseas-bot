@@ -131,18 +131,22 @@ class MusicCard {
         ctx.roundRect(0, 0, width, height, radius);
         ctx.stroke();
 
+        // Used for inside border
+        const borderMargin = 50
+
         // Cover
         try {
             const coverImage = await loadImage(this.cover);
-            ctx.drawImage(coverImage, 60, 60, 200, 200);
+            await this.drawRounded(ctx, borderMargin, borderMargin, 200, 200, 25, '', coverImage);
         } catch (error) {
             throw new TypeError('Failed to load cover image. Please make sure the URL is correct and points to an image.');
         }
 
-        const barWidth: number = canvas.width - 120;
+        // Progress Bar
+        const barWidth: number = canvas.width - borderMargin * 2;
         const barHeight: number = 20;
-        const barX: number = 60;
-        const barY: number = canvas.height - 80;
+        const barX: number = borderMargin;
+        const barY: number = canvas.height - borderMargin - barHeight;
         const progressPercent: number = this.songStart >= this.songDuration ? 1 : this.songStart / this.songDuration;
         var radius = 10;
 
@@ -159,10 +163,9 @@ class MusicCard {
         }
     }
 
-    private drawRounded(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fillStyle: string, isProgressBar: boolean = false): void {
+    private async drawRounded(ctx: CanvasRenderingContext2D | any, x: number, y: number, width: number, height: number, radius: number, fillStyle: string, image?: CanvasImageSource | CanvasImageData | any): Promise<void> {
         const r = Math.min(radius, width / 2, height / 2);
 
-        ctx.fillStyle = fillStyle;
         ctx.beginPath();
         ctx.moveTo(x + r, y);
         ctx.lineTo(x + width - r, y);
@@ -174,7 +177,16 @@ class MusicCard {
         ctx.lineTo(x, y + r);
         ctx.arcTo(x, y, x + r, y, r);
         ctx.closePath();
-        ctx.fill();
+
+        if (image) {
+            ctx.save();
+            ctx.clip();
+            ctx.drawImage(image, x, y, width, height);
+            ctx.restore();
+        } else {
+            ctx.fillStyle = fillStyle;
+            ctx.fill();
+        }
     }
 }
 
