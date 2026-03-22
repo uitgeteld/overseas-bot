@@ -20,6 +20,7 @@ class MusicCard {
     songStart: number;
     songDuration: number;
     color: ColorConfig;
+    font: string;
 
     /**
      * @hideconstructor
@@ -42,6 +43,7 @@ class MusicCard {
                 background: '#555555bb'
             }
         };
+        this.font = 'Arial';
     }
 
     /**
@@ -137,7 +139,7 @@ class MusicCard {
         // Cover
         try {
             const coverImage = await loadImage(this.cover);
-            await this.drawRounded(ctx, borderMargin, borderMargin, 200, 200, 25, '', coverImage);
+            await this.drawRounded(ctx, borderMargin, borderMargin, 225, 225, 25, '', coverImage);
         } catch (error) {
             throw new TypeError('Failed to load cover image. Please make sure the URL is correct and points to an image.');
         }
@@ -155,6 +157,16 @@ class MusicCard {
 
         // Foreground of the progress bar
         this.drawRounded(ctx, barX, barY, barWidth * progressPercent, barHeight, radius, this.color.bar.color);
+
+        // Time Text
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `16px ${this.font}`;
+        ctx.textAlign = 'left';
+        ctx.fillText(this.formatTime(this.songStart) + " / " + this.formatTime(this.songDuration), barX + 10, barY - 10);
+        // ctx.textAlign = 'right';
+        // ctx.fillText(this.formatTime(this.songStart), barX + barWidth, barY - 10);
+        // ctx.textAlign = 'left';
+        // ctx.fillText(this.formatTime(this.songDuration), barX, barY - 10);
 
         try {
             return await canvas.toBuffer('image/png');
@@ -187,6 +199,12 @@ class MusicCard {
             ctx.fillStyle = fillStyle;
             ctx.fill();
         }
+    }
+
+    private formatTime(seconds: number): string {
+        const minutes: number = Math.floor(seconds / 60);
+        const remainingSeconds: number = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 }
 
