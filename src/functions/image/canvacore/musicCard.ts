@@ -30,7 +30,7 @@ class MusicCard {
         this.artist = '';
         this.album = '';
         this.cover = '';
-        this.songStart = 201;
+        this.songStart = 20;
         this.songDuration = 200;
         this.color = {
             background: {
@@ -161,12 +161,7 @@ class MusicCard {
         // Time Text
         ctx.fillStyle = '#FFFFFF';
         ctx.font = `16px ${this.font}`;
-        ctx.textAlign = 'left';
-        ctx.fillText(this.formatTime(this.songStart) + " / " + this.formatTime(this.songDuration), barX + 10, barY - 10);
-        // ctx.textAlign = 'right';
-        // ctx.fillText(this.formatTime(this.songStart), barX + barWidth, barY - 10);
-        // ctx.textAlign = 'left';
-        // ctx.fillText(this.formatTime(this.songDuration), barX, barY - 10);
+        ctx.fillText(this.formatTime(this.songStart) + " / " + this.formatTime(this.songDuration), barWidth / 2, barY + barHeight - 4);
 
         try {
             return await canvas.toBuffer('image/png');
@@ -175,6 +170,19 @@ class MusicCard {
         }
     }
 
+    /**
+     * Draw a rounded rectangle and optionally draw an image clipped to it.
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Canvas rendering context
+     * @param {number} x X coordinate of the rectangle
+     * @param {number} y Y coordinate of the rectangle
+     * @param {number} width Width of the rectangle
+     * @param {number} height Height of the rectangle
+     * @param {number} radius Corner radius for rounded corners
+     * @param {string} fillStyle Fill color used when no `image` is provided
+     * @param {CanvasImageSource} [image] Optional image to draw inside the rounded rectangle
+     * @returns {Promise<void>} Resolves when drawing is complete
+     */
     private async drawRounded(ctx: CanvasRenderingContext2D | any, x: number, y: number, width: number, height: number, radius: number, fillStyle: string, image?: CanvasImageSource | CanvasImageData | any): Promise<void> {
         const r = Math.min(radius, width / 2, height / 2);
 
@@ -201,6 +209,12 @@ class MusicCard {
         }
     }
 
+    /**
+     * Format seconds into a minutes:seconds string.
+     * @private
+     * @param {number} seconds Time in seconds to format
+     * @returns {string} Formatted time as M:SS
+     */
     private formatTime(seconds: number): string {
         const minutes: number = Math.floor(seconds / 60);
         const remainingSeconds: number = Math.floor(seconds % 60);
