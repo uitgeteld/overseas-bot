@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { createCanvas, loadImage, CanvasRenderingContext2D } from '@napi-rs/canvas';
 
 interface ColorConfig {
@@ -118,11 +119,16 @@ class MusicCard {
                     const backgroundImage = await loadImage(this.color.background.data);
                     ctx.drawImage(backgroundImage, 0, 0, width, height);
                 } catch (error) {
-                    throw new TypeError('Failed to load background image. Please make sure the URL is correct and points to an image.');
+                    throw new Error(this.formatError(
+                        'Failed to load background image. Please make sure the URL is correct and points to an image.',
+                        error
+                    ));
                 }
                 break;
             default:
-                throw new Error('Invalid background type. Type must be either "color" or "image".');
+                throw new Error(this.formatError(
+                    'Invalid background type. Type must be either "color" or "image".'
+                ));
         }
 
         // Border
@@ -139,9 +145,13 @@ class MusicCard {
         // Cover
         try {
             const coverImage = await loadImage(this.cover);
-            await this.drawRounded(ctx, borderMargin, borderMargin, 225, 225, 25, '', coverImage);
+            var radius = 20;
+            await this.drawRounded(ctx, borderMargin, borderMargin, 250, 250, radius, '', coverImage);
         } catch (error) {
-            throw new TypeError('Failed to load cover image. Please make sure the URL is correct and points to an image.');
+            throw new Error(this.formatError(
+                'Failed to load cover image. Please make sure the URL is correct and points to an image.',
+                error
+            ));
         }
 
         // Progress Bar
@@ -166,7 +176,7 @@ class MusicCard {
         try {
             return await canvas.toBuffer('image/png');
         } catch (error) {
-            throw new Error('Failed to generate MusicCard image.');
+            throw new Error(this.formatError('Failed to build image.', error));
         }
     }
 
@@ -219,6 +229,23 @@ class MusicCard {
         const minutes: number = Math.floor(seconds / 60);
         const remainingSeconds: number = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+
+    /**
+     * Format error messages for consistent logging.
+     * @private
+     * @param {string} message Custom error message to provide context
+     * @param {unknown} [error] Optional error object to extract message from
+     * @returns {string} Formatted error string with context and error details
+     */
+    private formatError(message: string, error?: unknown): string {
+        const errorMessage = error instanceof Error ? error.message : String(error ?? 'Unknown error');
+
+        return [
+            chalk.red('CANVACORE'),
+            chalk.white(message),
+            chalk.white(errorMessage),
+        ].join('\n');
     }
 }
 
