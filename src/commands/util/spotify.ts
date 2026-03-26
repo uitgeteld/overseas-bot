@@ -19,7 +19,7 @@ export default {
 
         if (isPlayingSpotify(member?.presence)) {
             const spotifyActivity = isPlayingSpotify(member?.presence);
-            if(spotifyActivity.state == null) return await interaction.editReply('This user is not listening to music on Spotify.');
+            if (spotifyActivity.state == null) return await interaction.editReply('This user is not listening to music on Spotify.');
 
             const songStartTime = spotifyActivity.timestamps?.start;
             const songEndTime = spotifyActivity.timestamps?.end;

@@ -146,12 +146,41 @@ class MusicCard {
         try {
             const coverImage = await loadImage(this.cover);
             var radius = 20;
-            await this.drawRounded(ctx, borderMargin, borderMargin, 250, 250, radius, '', coverImage);
+            var imageSize = 250;
+            await this.drawRounded(ctx, borderMargin, borderMargin, imageSize, imageSize, radius, '', coverImage);
         } catch (error) {
             throw new Error(this.formatError(
                 'Failed to load cover image. Please make sure the URL is correct and points to an image.',
                 error
             ));
+        }
+
+        // Song Title
+        // Typography settings
+        const titleX = imageSize + 70;
+        const titleY = borderMargin + 40;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold 36px ${this.font}`;
+        // truncate long title
+        this.drawTruncatedText(ctx, this.song, titleX, titleY, canvas.width - titleX - borderMargin, 'bold 36px ' + this.font);
+
+        // Playback icon
+        const playSize = 28;
+        const playX = imageSize + 12;
+        const playY = imageSize - 182;
+        console.log(playX, playY);
+        this.drawPlaybackIcon(ctx, playX, playY, playSize);
+
+        // Artist Name
+        ctx.fillStyle = '#bfbfbf';
+        ctx.font = `22px ${this.font}`;
+        this.drawTruncatedText(ctx, this.artist, titleX, titleY + 36, canvas.width - titleX - borderMargin, '22px ' + this.font);
+
+        // Album (optional)
+        if (this.album && this.album.trim() !== '') {
+            ctx.fillStyle = '#9a9a9a';
+            ctx.font = `18px ${this.font}`;
+            this.drawTruncatedText(ctx, this.album, titleX, titleY + 62, canvas.width - titleX - borderMargin, '18px ' + this.font);
         }
 
         // Progress Bar
@@ -160,18 +189,45 @@ class MusicCard {
         const barX: number = borderMargin;
         const barY: number = canvas.height - borderMargin - barHeight;
         const progressPercent: number = this.songStart >= this.songDuration ? 1 : this.songStart / this.songDuration;
+        const bufferedPercent = Math.min(progressPercent + 0.4, 0.7);
         var radius = 10;
 
-        // Background of the progress bar
+        // Waveform visualization
+        const wfX = titleX;
+        const wfY = titleY + 90;
+        const wfWidth = canvas.width - titleX - borderMargin;
+        const wfHeight = this.album && this.album.trim() !== '' ? 60 : 80;
+        this.drawWaveform(ctx, wfX, wfY, wfWidth, wfHeight, progressPercent);
+
+        // Draw background track
         this.drawRounded(ctx, barX, barY, barWidth, barHeight, radius, this.color.bar.background);
+
+        // Draw buffered area
+        ctx.save();
+        ctx.globalAlpha = 0.6;
+        this.drawRounded(ctx, barX, barY, barWidth * bufferedPercent, barHeight, radius, '#888888');
+        ctx.restore();
 
         // Foreground of the progress bar
         this.drawRounded(ctx, barX, barY, barWidth * progressPercent, barHeight, radius, this.color.bar.color);
 
-        // Time Text
+        // Progress knob
+        const knobX = barX + (barWidth * progressPercent) - 10;
+        const knobY = barY + barHeight / 2;
+        ctx.beginPath();
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 6;
+        ctx.arc(knobX, knobY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Time Text (right-aligned)
         ctx.fillStyle = '#FFFFFF';
         ctx.font = `16px ${this.font}`;
-        ctx.fillText(this.formatTime(this.songStart) + " / " + this.formatTime(this.songDuration), barWidth / 2, barY + barHeight - 4);
+        const timeText = this.formatTime(this.songStart) + " / " + this.formatTime(this.songDuration);
+        const timeWidth = ctx.measureText(timeText).width;
+        ctx.fillText(timeText, barX + barWidth - timeWidth - 10, barY - 10);
 
         try {
             return await canvas.toBuffer('image/png');
@@ -216,6 +272,79 @@ class MusicCard {
         } else {
             ctx.fillStyle = fillStyle;
             ctx.fill();
+        }
+    }
+
+    /**
+     * Draw the play/pause icon based on the current playback state.
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Canvas rendering context
+     * @param {number} x X coordinate of the top-left corner of the icon
+     * @param {number} y Y coordinate of the top-left corner of the icon
+     * @param {number} size Size of the icon (width and height)
+     */
+    private drawPlaybackIcon(ctx: CanvasRenderingContext2D | any, x: number, y: number, size: number) {
+        ctx.save();
+        ctx.fillStyle = '#1DB954';
+        // draw two pause bars
+        const bw = size * 0.28;
+        const gap = bw * 0.6;
+        ctx.fillRect(x, y, bw, size);
+        ctx.fillRect(x + bw + gap, y, bw, size);
+        ctx.restore();
+    }
+
+    /** 
+     * Draw text that is truncated with ellipsis if it exceeds the specified max width. Optionally set font before measuring text.
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Canvas rendering context
+     * @param {string} text Text to draw
+     * @param {number} x X coordinate to start drawing text
+     * @param {number} y Y coordinate to start drawing text
+     * @param {number} maxWidth Maximum width in pixels before truncating text
+     * @param {string} [font] Optional font to set before measuring text (e.g. "bold 24px Arial")
+     */
+    private drawTruncatedText(ctx: CanvasRenderingContext2D | any, text: string, x: number, y: number, maxWidth: number, font?: string) {
+        if (font) ctx.font = font;
+        let measured = ctx.measureText(text).width;
+        if (measured <= maxWidth) {
+            ctx.fillText(text, x, y);
+            return;
+        }
+        let ell = '...';
+        let len = text.length;
+        while (len > 0) {
+            text = text.substring(0, len) + ell;
+            if (ctx.measureText(text).width <= maxWidth) break;
+            len--;
+            text = text.substring(0, len);
+        }
+        ctx.fillText(text, x, y);
+    }
+
+    /**
+     * Draw a simple waveform visualization based on the current progress of the song.
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Canvas rendering context
+     * @param {number} x X coordinate of the waveform area
+     * @param {number} y Y coordinate of the waveform area
+     * @param {number} width Width of the waveform area
+     * @param {number} height Height of the waveform area
+     * @param {number} progress Current progress of the song (0 to 1)
+     */
+    private drawWaveform(ctx: CanvasRenderingContext2D | any, x: number, y: number, width: number, height: number, progress: number) {
+        const bars = 28;
+        const gap = 4;
+        const barWidth = (width - (bars - 1) * gap) / bars;
+        for (let i = 0; i < bars; i++) {
+            // simulate waveform with sinus + progress based variance
+            const pos = i / bars;
+            const sine = Math.abs(Math.sin((pos + progress) * Math.PI * 2));
+            const h = 4 + sine * (height - 8);
+            const bx = x + i * (barWidth + gap);
+            const by = y + (height - h) / 2;
+            ctx.fillStyle = '#8fbf8f';
+            ctx.fillRect(bx, by, barWidth, h);
         }
     }
 
