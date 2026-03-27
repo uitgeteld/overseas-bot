@@ -41,7 +41,7 @@ class MusicCard {
             border: '#111111',
             bar: {
                 color: '#1DB954',
-                background: '#555555bb'
+                background: '#414141'
             }
         };
         this.font = 'Arial';
@@ -155,32 +155,33 @@ class MusicCard {
             ));
         }
 
+        // Playback icon
+        const playSize = 28;
+        const playX = imageSize + 12;
+        const playY = imageSize - 182;
+        this.drawPlaybackIcon(ctx, playX, playY, playSize);
+
         // Song Title
         // Typography settings
         const titleX = imageSize + 70;
-        const titleY = borderMargin + 40;
+        var titleY = borderMargin + 40;
         ctx.fillStyle = '#FFFFFF';
         ctx.font = `bold 36px ${this.font}`;
         // truncate long title
         this.drawTruncatedText(ctx, this.song, titleX, titleY, canvas.width - titleX - borderMargin, 'bold 36px ' + this.font);
 
-        // Playback icon
-        const playSize = 28;
-        const playX = imageSize + 12;
-        const playY = imageSize - 182;
-        console.log(playX, playY);
-        this.drawPlaybackIcon(ctx, playX, playY, playSize);
-
         // Artist Name
+        var titleY = titleY + 34;
         ctx.fillStyle = '#bfbfbf';
         ctx.font = `22px ${this.font}`;
-        this.drawTruncatedText(ctx, this.artist, titleX, titleY + 36, canvas.width - titleX - borderMargin, '22px ' + this.font);
+        this.drawTruncatedText(ctx, this.artist, titleX, titleY, canvas.width - titleX - borderMargin, '22px ' + this.font);
 
         // Album (optional)
         if (this.album && this.album.trim() !== '') {
             ctx.fillStyle = '#9a9a9a';
             ctx.font = `18px ${this.font}`;
-            this.drawTruncatedText(ctx, this.album, titleX, titleY + 62, canvas.width - titleX - borderMargin, '18px ' + this.font);
+            var titleY = titleY + 28;
+            this.drawTruncatedText(ctx, this.album, titleX, titleY, canvas.width - titleX - borderMargin, '18px ' + this.font);
         }
 
         // Progress Bar
@@ -189,12 +190,12 @@ class MusicCard {
         const barX: number = borderMargin;
         const barY: number = canvas.height - borderMargin - barHeight;
         const progressPercent: number = this.songStart >= this.songDuration ? 1 : this.songStart / this.songDuration;
-        const bufferedPercent = Math.min(progressPercent + 0.4, 0.7);
+        const bufferedPercent = Math.min(progressPercent + 0.05, 1); // Simulate buffered area as 10% ahead of current progress
         var radius = 10;
 
         // Waveform visualization
         const wfX = titleX;
-        const wfY = titleY + 90;
+        const wfY = this.album && this.album.trim() !== '' ? imageSize - titleY / 2 + 18 : imageSize - titleY + 10;
         const wfWidth = canvas.width - titleX - borderMargin;
         const wfHeight = this.album && this.album.trim() !== '' ? 60 : 80;
         this.drawWaveform(ctx, wfX, wfY, wfWidth, wfHeight, progressPercent);
@@ -357,6 +358,7 @@ class MusicCard {
     private formatTime(seconds: number): string {
         const minutes: number = Math.floor(seconds / 60);
         const remainingSeconds: number = Math.floor(seconds % 60);
+
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 
