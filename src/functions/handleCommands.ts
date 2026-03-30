@@ -18,7 +18,17 @@ export default async function handleCommands(client: Client, commandsPath: strin
       const command = commandModule.default || commandModule;
       
       client.commands.set(command.data.name, command);
-      commandArray.push(command.data.toJSON());
+      const commandJson = command.data.toJSON();
+      commandJson.dm_permission = !command.guildOnly;
+      
+      if (command.guildOnly) {
+        commandJson.integration_types = [0];
+        commandJson.contexts = [0];
+      } else {
+        commandJson.integration_types = [0, 1];
+        commandJson.contexts = [0, 1, 2];
+      }
+      commandArray.push(commandJson);
       
       if (command.aliases && Array.isArray(command.aliases)) {
         for (const alias of command.aliases) {
@@ -32,7 +42,17 @@ export default async function handleCommands(client: Client, commandsPath: strin
           }
           
           client.commands.set(alias, command);
-          commandArray.push(aliasData.toJSON());
+          const aliasJson = aliasData.toJSON();
+          aliasJson.dm_permission = !command.guildOnly;
+          
+          if (command.guildOnly) {
+            aliasJson.integration_types = [0];
+            aliasJson.contexts = [0];
+          } else {
+            aliasJson.integration_types = [0, 1];
+            aliasJson.contexts = [0, 1, 2];
+          }
+          commandArray.push(aliasJson);
         }
       }
     }

@@ -19,13 +19,21 @@ export default {
           }
         } else if (command.guildOnly && !interaction.guild) {
           return await interaction.reply({
-            content: 'This command can only be used in a server.',
-            flags: MessageFlags.Ephemeral
+            content: 'This command can only be used in a server.'
           });
         }
         await command.execute(interaction, client);
       } catch (error) {
-        await interaction.reply({ content: "There was an error while executing this command!", flags: MessageFlags.Ephemeral });
+        console.error(error);
+        try {
+          if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({ content: "There was an error while executing this command!" });
+          } else {
+            await interaction.reply({ content: "There was an error while executing this command!" });
+          }
+        } catch (replyError) {
+          console.error("Failed to send error message:", replyError);
+        }
       }
     }
   }
