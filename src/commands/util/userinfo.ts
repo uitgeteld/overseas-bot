@@ -7,10 +7,15 @@ export default {
         .addUserOption(option =>
             option.setName('user')
                 .setDescription('The user to get information about')
+                .setRequired(false))
+        .addBooleanOption(option =>
+            option.setName("ephemeral")
+                .setDescription("Whether the reply should be ephemeral")
                 .setRequired(false)),
     aliases: ['ui'],
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
-        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
+        await interaction.deferReply({ flags: ephemeral ? MessageFlags.Ephemeral : undefined });
 
         const user = interaction.options.getUser('user') || interaction.user;
         const member = interaction.guild?.members.cache.get(user.id);
@@ -23,10 +28,18 @@ export default {
             .addFields(
                 { name: 'Username', value: user.username, inline: true },
                 { name: 'User ID', value: user.id, inline: true },
-                { name: 'Account Created', value: `<t:${Math.floor(user.createdTimestamp / 1000)}:F>`, inline: false },
-                { name: 'Joined Server', value: member ? `<t:${Math.floor(member.joinedTimestamp! / 1000)}:F>` : 'N/A', inline: false },
             )
+        if (fullUser.primaryGuild && fullUser.primaryGuild.identityEnabled) {
+            embed.addFields({ name: 'Badge', value: `${fullUser.primaryGuild.tag}`, inline: true });
+        }
+        embed.addFields(
+            { name: 'Account Created', value: `<t:${Math.floor(user.createdTimestamp / 1000)}:F>`, inline: false },
+        )
             .setColor('#C9C2B2');
+
+        if (member) {
+            embed.addFields({ name: 'Joined Server', value: `<t:${Math.floor(member.joinedTimestamp! / 1000)}:F>`, inline: false });
+        }
 
         if (fullUser.banner) {
             embed.setImage(fullUser.bannerURL({ size: 1024 })!);
