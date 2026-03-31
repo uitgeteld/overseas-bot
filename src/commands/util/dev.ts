@@ -11,10 +11,15 @@ export default {
         await interaction.deferReply();
 
         const user = interaction.options.getUser('user') || interaction.user;
-        const member = interaction.guild?.members.cache.get(user.id);
+        let presence =
+            interaction.guild?.members.cache.get(user.id)?.presence ??
+            client.guilds.cache
+                .map(guild => guild.members.cache.get(user.id))
+                .find(member => member?.presence != null)
+                ?.presence;
 
-        if (isPlayingSpotify(member?.presence)) {
-            const spotifyActivity = isPlayingSpotify(member?.presence);
+        if (isPlayingSpotify(presence)) {
+            const spotifyActivity = isPlayingSpotify(presence);
             if (spotifyActivity.state == null) return await interaction.editReply('This user is not listening to music on Spotify.');
             const songStartTime = spotifyActivity.timestamps?.start;
             const songEndTime = spotifyActivity.timestamps?.end;
@@ -33,6 +38,8 @@ export default {
             interaction.editReply({
                 files: [attachment]
             });
+        } else {
+            await interaction.editReply('This user is not currently in a server where I am present.');
         }
     }
 };
