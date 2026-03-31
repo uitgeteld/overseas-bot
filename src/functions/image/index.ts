@@ -1,4 +1,4 @@
-import { ImageColorExtractor } from './canvacore/imageColorExtractor'
+import { ImageColorExtractor } from './canvacore/helpers/imageColorExtractor'
 import { SpotifyCard } from './canvacore/spotifyCard'
 import { MusicCard } from './canvacore/musicCard'
 import brightness from './grainular/brightness';
