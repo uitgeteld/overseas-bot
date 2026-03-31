@@ -20,8 +20,12 @@ export default {
             const command = client.commands.get(commandName);
 
             if (!command) {
-                return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
-            }
+                    return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
+                }
+
+                if (command.guildOnly && !interaction.guild) {
+                    return await interaction.reply({ content: `The command "/${commandName}" is only available in servers.`, flags: MessageFlags.Ephemeral });
+                }
 
             const embed = new EmbedBuilder()
                 .setColor('#C9C2B2')
@@ -57,6 +61,7 @@ export default {
                 .filter(cmd => {
                     const cmdPath = path.join(commandsPath, folder, `${cmd.data.name}.ts`);
                     if (cmd.devOnly) return false;
+                    if (!interaction.guild && cmd.guildOnly) return false;
                     return fs.existsSync(cmdPath);
                 })
                 .filter((cmd, index, self) => {
