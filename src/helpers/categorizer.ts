@@ -7,7 +7,6 @@ const categories: Categories = {
     image: '🖼️ Image',
     moderation: '🛡️ Moderation',
     settings: '⚙️ Settings',
-    tickets: '🎫 Tickets',
     util: '🔧 Utility',
 };
 
