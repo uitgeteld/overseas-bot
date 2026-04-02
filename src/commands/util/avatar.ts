@@ -10,8 +10,6 @@ export default {
                 .setRequired(false)),
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         const user = interaction.options.getUser('user') || interaction.user;
-        const member = interaction.guild?.members.cache.get(user.id);
-
         const avatarUrl = user.displayAvatarURL({ forceStatic: false, size: 1024 });
 
         const embed = new EmbedBuilder()
@@ -23,15 +21,24 @@ export default {
 
         const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-            .setLabel('PNG')
-            .setStyle(ButtonStyle.Link)
-            .setURL(`${avatarUrl}?size=1024`),
-            
+                .setLabel('PNG')
+                .setStyle(ButtonStyle.Link)
+                .setURL(user.displayAvatarURL({ forceStatic: true, size: 1024, extension: 'png' })),
+
             new ButtonBuilder()
-            .setLabel('JPG')
-            .setStyle(ButtonStyle.Link)
-            .setURL(`${avatarUrl.replace('.webp', '.jpg')}?size=1024`),
+                .setLabel('JPG')
+                .setStyle(ButtonStyle.Link)
+                .setURL(user.displayAvatarURL({ forceStatic: true, size: 1024, extension: 'jpg' }))
         );
+
+        if (user.displayAvatarURL({ forceStatic: false }).endsWith('.gif')) {
+            buttons.addComponents(
+                new ButtonBuilder()
+                    .setLabel('GIF')
+                    .setStyle(ButtonStyle.Link)
+                    .setURL(user.displayAvatarURL({ forceStatic: false, size: 1024, extension: 'gif' }))
+            );
+        };
 
         await interaction.reply({ embeds: [embed], components: [buttons] });
     }
