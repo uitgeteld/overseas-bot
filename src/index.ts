@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits } from "discord.js";
-import { config, loadStartOptions } from "./config";
+import { config } from "./config";
 import path from "path";
 import handleCommands from "./functions/handleCommands";
 import handleEvents from "./functions/handleEvents";
@@ -15,8 +15,6 @@ const client = new Client({
         GatewayIntentBits.GuildPresences
     ],
 }) as Client;
-
-loadStartOptions(client);
 
 const commandsPath = path.join(__dirname, "./commands");
 const eventsPath = path.join(__dirname, "./events");
@@ -37,15 +35,13 @@ try {
         console.log('Files changed:');
         console.log(diffStat);
 
-        if (client.startOptions.gitPull) {
-            try {
-                console.log('Pulling latest changes from GitHub...');
-                execSync('git pull origin main', { stdio: 'inherit' });
-                console.log('Successfully updated from GitHub!\n');
-            } catch (error) {
-                console.log(`Could not pull from GitHub ${error}\n`);
-                console.log('Continuing with existing files...\n');
-            }
+        try {
+            console.log('Pulling latest changes from GitHub...');
+            execSync('git pull origin main', { stdio: 'inherit' });
+            console.log('Successfully updated from GitHub!\n');
+        } catch (error) {
+            console.log(`Could not pull from GitHub ${error}\n`);
+            console.log('Continuing with existing files...\n');
         }
     } else {
         console.log('No updates available.\n');

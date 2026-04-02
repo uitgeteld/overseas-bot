@@ -11,8 +11,5 @@ export interface Command {
 declare module "discord.js" {
   interface Client {
     commands: Collection<string, Command>;
-    startOptions: {
-        gitPull: boolean;
-    }
   }
 }
