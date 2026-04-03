@@ -6,8 +6,7 @@ import { loadModule } from "../helpers/loadModule";
 
 const folderColors: Record<string, (text: string) => string> = {
   guildMember: chalk.cyan,
-  git: chalk.magenta,
-  ticket: chalk.green,
+  git: chalk.magenta
 };
 
 function getFolderColor(folder: string): (text: string) => string {
