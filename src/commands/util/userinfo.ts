@@ -22,9 +22,9 @@ export default {
         const fullUser = await client.users.fetch(user.id, { force: true });
 
         const embed = new EmbedBuilder()
-            .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({ forceStatic: false }) })
+            .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL()?.endsWith(".gif") ? user.displayAvatarURL({ forceStatic: false, size: 1024, extension: "gif" }) : user.displayAvatarURL({ forceStatic: true, size: 1024, extension: "png" }) })
             .setTitle(user.displayName || user.username)
-            .setThumbnail(user.displayAvatarURL({ forceStatic: false }))
+            .setThumbnail(user.displayAvatarURL()?.endsWith(".gif") ? user.displayAvatarURL({ forceStatic: false, size: 1024, extension: "gif" }) : user.displayAvatarURL({ forceStatic: true, size: 1024, extension: "png" }))
             .addFields(
                 { name: 'Username', value: user.username, inline: true },
                 { name: 'User ID', value: user.id, inline: true },
@@ -42,7 +42,11 @@ export default {
         }
 
         if (fullUser.banner) {
-            embed.setImage(fullUser.bannerURL({ size: 1024 })!);
+            if (fullUser.bannerURL()?.endsWith('.gif')) {
+                embed.setImage(fullUser.bannerURL({ size: 1024, forceStatic: false, extension: "gif" })!);
+            } else {
+                embed.setImage(fullUser.bannerURL({ size: 1024, forceStatic: true, extension: "png" })!);
+            }
         }
 
         await interaction.editReply({ embeds: [embed] });
