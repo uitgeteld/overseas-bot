@@ -14,7 +14,7 @@ export default {
             option.setName('amount')
                 .setDescription('The amount of saturation to apply (default: 20)')
                 .setRequired(false)),
-    async execute(interaction: ChatInputCommandInteraction, client: Client) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const attachment = interaction.options.getAttachment('image', true);
         const amount = interaction.options.getNumber('amount') ?? 20;

@@ -19,7 +19,7 @@ export default {
             option.setName('treshold')
                 .setDescription('The treshold for the monochrome effect (default: 128)')
                 .setRequired(false)),
-    async execute(interaction: ChatInputCommandInteraction, client: Client) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const attachment = interaction.options.getAttachment('image', true);
         const type = interaction.options.getString('type', true);

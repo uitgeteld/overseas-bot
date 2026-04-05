@@ -4,7 +4,7 @@ import { query } from "../../utils/database";
 export default {
     name: "guildMemberRemove",
     once: false,
-    async execute(member: GuildMember, client: Client) {
+    async execute(member: GuildMember) {
         try {
             const settings = await query('SELECT goodbye_channel_id FROM guild_settings WHERE guild_id = ?', [member.guild.id]);
             if (settings.length && (settings[0] as any).goodbye_channel_id) {

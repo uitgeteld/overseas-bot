@@ -18,7 +18,7 @@ export default {
             option.setName('colored')
                 .setDescription('Whether to apply colored grain (default: false)')
                 .setRequired(false)),
-    async execute(interaction: ChatInputCommandInteraction, client: Client) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const attachment = interaction.options.getAttachment('image', true);
         const amount = interaction.options.getNumber('amount') ?? 20;

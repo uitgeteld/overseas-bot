@@ -8,7 +8,7 @@ export default {
             option.setName('user')
                 .setDescription('The user to view avatar for')
                 .setRequired(false)),
-    async execute(interaction: ChatInputCommandInteraction, client: Client) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const user = interaction.options.getUser('user') || interaction.user;
         const avatarUrl = user.displayAvatarURL({ forceStatic: false, size: 1024 });
 

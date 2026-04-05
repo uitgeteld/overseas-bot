@@ -22,7 +22,7 @@ export default {
                 .find(member => member?.presence != null)
                 ?.presence;
 
-        if(!presence) return await interaction.editReply('This user is currently not in a server where I am present.');
+        if (!presence) return await interaction.editReply('This user is currently not in a server where I am present.');
 
         if (isPlayingSpotify(presence)) {
             const spotifyActivity = isPlayingSpotify(presence);

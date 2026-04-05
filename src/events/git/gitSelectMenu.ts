@@ -5,7 +5,7 @@ import githubFetch from "../../helpers/githubFetcher";
 export default {
     name: "interactionCreate",
     once: false,
-    async execute(interaction: Interaction, client: Client) {
+    async execute(interaction: Interaction) {
         if (!interaction.isStringSelectMenu()) return;
 
         if (interaction.customId.startsWith('git-user-repo-select')) {
