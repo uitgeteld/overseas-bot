@@ -54,7 +54,11 @@ const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);
 console.log(`Setup completed in ${setupTime}s\n\n`);
 
 (async () => {
-    await initializeDatabase();
+    try {
+        await initializeDatabase();
+    } catch {
+        console.log('Failed to initialize database. Continuing without database connection.');
+    }
     await handleCommands(client, commandsPath);
     await handleEvents(client, eventsPath);
     client.login(config.TOKEN);
