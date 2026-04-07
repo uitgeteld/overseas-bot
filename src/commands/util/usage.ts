@@ -5,6 +5,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName('usage')
         .setDescription('Replies with information about the bot\'s usage and statistics'),
+    dev: true,
     async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
 
@@ -50,7 +51,7 @@ export default {
                 { name: 'CPU Usage', value: `${cpuPercent.toFixed(2)}%`, inline: true },
                 { name: 'Total RAM', value: toMB(totalMem), inline: true },
                 { name: 'Bot RAM Used', value: toMB(mem.rss), inline: true },
-                { name: "Uptime", value: `\`\`\`${formatUptime(process.uptime())}\`\`\``}
+                { name: "Uptime", value: `\`\`\`${formatUptime(process.uptime())}\`\`\`` }
             )
             .setFooter({ text: `Node ${process.version} | Platform ${process.platform}` });
 

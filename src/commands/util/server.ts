@@ -6,6 +6,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName('server')
         .setDescription('Shows the server specs'),
+    dev: true,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply();
 

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
-import os from 'os';
+
 export default {
     data: new SlashCommandBuilder()
         .setName('ping')

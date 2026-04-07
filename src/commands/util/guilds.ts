@@ -4,7 +4,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName('guilds')
         .setDescription('Replies with list of guilds the bot is in'),
-    devOnly: true,
+    dev: true,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral});
 

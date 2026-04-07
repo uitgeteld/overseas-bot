@@ -17,7 +17,7 @@ export default {
                 .setDescription('Reason for timing out the member')
                 .setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
-        guildOnly: true,
+        guild: true,
     async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
 

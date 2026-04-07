@@ -3,8 +3,8 @@ import { Client, Collection } from "discord.js";
 export interface Command {
   data: any;
   execute: (...args: any[]) => any;
-  devOnly?: boolean;
-  guildOnly?: boolean;
+  dev?: boolean;
+  guild?: boolean;
   aliases?: string[];
 }
 

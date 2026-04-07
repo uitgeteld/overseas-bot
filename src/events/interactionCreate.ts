@@ -8,7 +8,7 @@ export default {
     const command = client.commands.get(interaction.commandName);
     if (command) {
       try {
-        if (command.devOnly) {
+        if (command.dev) {
           const devIds = process.env.DEV_IDS?.split(",") || [];
 
           if (!devIds.includes(interaction.user.id)) {
@@ -17,7 +17,7 @@ export default {
               flags: MessageFlags.Ephemeral
             });
           }
-        } else if (command.guildOnly && !interaction.guild) {
+        } else if (command.guild && !interaction.guild) {
           return await interaction.reply({
             content: 'This command can only be used in a server.'
           });

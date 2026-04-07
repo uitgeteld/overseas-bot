@@ -3,7 +3,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName('dev')
         .setDescription('Development command for testing purposes'),
-    devOnly: true,
+    dev: true,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply();
     }

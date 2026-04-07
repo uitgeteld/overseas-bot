@@ -34,7 +34,7 @@ export default {
                 .setDescription('Reset all settings for the server')
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-    guildOnly: true,
+    guild: true,
     async execute(interaction: ChatInputCommandInteraction) {
         try {
             await interaction.deferReply({ flags: MessageFlags.Ephemeral });

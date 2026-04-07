@@ -13,7 +13,7 @@ export default {
                 .setDescription('Reason for kicking the member')
                 .setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
-        guildOnly: true,
+        guild: true,
     async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
 
