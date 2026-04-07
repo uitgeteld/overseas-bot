@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
-
+import os from 'os';
 export default {
     data: new SlashCommandBuilder()
         .setName('ping')
@@ -12,8 +12,8 @@ export default {
         const embed = new EmbedBuilder()
             .setTitle('🏓 Pong!')
             .setDescription(`Latency: **${Date.now() - start}ms**\nAPI: **${client.ws.ping}ms**`)
+            .setFooter({ text: `Node ${process.version} | Platform ${process.platform}` })
             .setColor('#C9C2B2');
-
         await interaction.editReply({ embeds: [embed] });
     }
 };
