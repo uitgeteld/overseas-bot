@@ -1,6 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 import os from 'os';
-import { check } from 'diskusage';
 
 export default {
     data: new SlashCommandBuilder()
@@ -24,21 +23,6 @@ export default {
         const usedMem = totalMem - freeMem;
         const memPercent = ((usedMem / totalMem) * 100).toFixed(2);
 
-        // Disk info
-        const drive = platform === 'win32' ? 'C:' : '/';
-        let diskTotal = 'N/A';
-        let diskUsed = 'N/A';
-        let diskPercent = 'N/A';
-
-        try {
-            const diskInfo = await check(drive);
-            diskTotal = toGB(diskInfo.total);
-            diskUsed = toGB(diskInfo.total - diskInfo.free);
-            diskPercent = ((((diskInfo.total - diskInfo.free) / diskInfo.total) * 100).toFixed(2)) + '%';
-        } catch (error) {
-            // Disk info not available
-        }
-
         // Uptime
         const formatUptime = (secs: number) => {
             const s = Math.floor(secs % 60);
@@ -61,8 +45,6 @@ export default {
                 { name: 'Total RAM', value: toGB(totalMem), inline: true },
                 { name: 'Used RAM', value: `${toGB(usedMem)} (${memPercent}%)`, inline: true },
                 { name: 'Free RAM', value: toGB(freeMem), inline: true },
-                { name: 'Total Disk', value: diskTotal, inline: true },
-                { name: 'Used Disk', value: `${diskUsed} (${diskPercent})`, inline: true },
                 { name: 'Server Uptime', value: formatUptime(os.uptime()), inline: true },
                 { name: 'Node Version', value: process.version, inline: true }
             )
