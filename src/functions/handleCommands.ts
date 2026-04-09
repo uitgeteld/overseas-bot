@@ -19,9 +19,9 @@ export default async function handleCommands(client: Client, commandsPath: strin
       
       client.commands.set(command.data.name, command);
       const commandJson = command.data.toJSON();
-      commandJson.dm_permission = !command.guildOnly;
+      commandJson.dm_permission = !command.guild;
       
-      if (command.guildOnly) {
+      if (command.guild) {
         commandJson.integration_types = [0];
         commandJson.contexts = [0];
       } else {
@@ -43,9 +43,9 @@ export default async function handleCommands(client: Client, commandsPath: strin
           
           client.commands.set(alias, command);
           const aliasJson = aliasData.toJSON();
-          aliasJson.dm_permission = !command.guildOnly;
+          aliasJson.dm_permission = !command.guild;
           
-          if (command.guildOnly) {
+          if (command.guild) {
             aliasJson.integration_types = [0];
             aliasJson.contexts = [0];
           } else {

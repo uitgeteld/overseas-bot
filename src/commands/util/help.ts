@@ -23,7 +23,7 @@ export default {
                     return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
                 }
 
-                if (command.guildOnly && !interaction.guild) {
+                if (command.guild && !interaction.guild) {
                     return await interaction.reply({ content: `The command "/${commandName}" is only available in servers.`, flags: MessageFlags.Ephemeral });
                 }
 
@@ -60,8 +60,8 @@ export default {
             const commandList = Array.from(client.commands.values())
                 .filter(cmd => {
                     const cmdPath = path.join(commandsPath, folder, `${cmd.data.name}.ts`);
-                    if (cmd.devOnly) return false;
-                    if (!interaction.guild && cmd.guildOnly) return false;
+                    if (cmd.dev) return false;
+                    if (!interaction.guild && cmd.guild) return false;
                     return fs.existsSync(cmdPath);
                 })
                 .filter((cmd, index, self) => {
