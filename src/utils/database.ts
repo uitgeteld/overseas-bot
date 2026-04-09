@@ -74,6 +74,11 @@ export async function instance() {
     }
 }
 
+export async function status(): Promise<{ connected: boolean; database: string | null }> {
+    if (!pool) return { connected: false, database: null };
+    return { connected: true, database: process.env.DB_NAME || null };
+}
+
 /**
  * Execute a query and return results
  * @example
