@@ -7,13 +7,11 @@ export default {
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         const start = Date.now();
 
-        await interaction.deferReply();
-
         const embed = new EmbedBuilder()
             .setTitle('🏓 Pong!')
             .setDescription(`Latency: **${Date.now() - start}ms**\nAPI: **${client.ws.ping}ms**`)
             .setFooter({ text: `Node ${process.version} | Platform ${process.platform}` })
             .setColor('#C9C2B2');
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] });
     }
 };

@@ -12,8 +12,6 @@ export default {
                 .setRequired(false)),
     aliases: ['np', 'spotify'],
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
-        await interaction.deferReply();
-
         const user = interaction.options.getUser('user') || interaction.user;
         let presence =
             interaction.guild?.members.cache.get(user.id)?.presence ??
@@ -22,12 +20,12 @@ export default {
                 .find(member => member?.presence != null)
                 ?.presence;
 
-        if (!presence) return await interaction.editReply('This user is currently not in a server where I am present.');
+        if (!presence) return await interaction.reply('This user is currently not in a server where I am present.');
 
         if (isPlayingSpotify(presence)) {
             const spotifyActivity = isPlayingSpotify(presence);
 
-            if (spotifyActivity.state == null) return await interaction.editReply('This user is currently not listening to music.');
+            if (spotifyActivity.state == null) return await interaction.reply('This user is currently not listening to music.');
 
             const songStartTime = spotifyActivity.timestamps?.start;
             const songEndTime = spotifyActivity.timestamps?.end;
@@ -44,9 +42,9 @@ export default {
 
             const attachment = new AttachmentBuilder(card!, { name: 'musicCard.png' });
 
-            interaction.editReply({ files: [attachment] });
+            interaction.reply({ files: [attachment] });
         } else {
-            await interaction.editReply('This user is currently not listening to music.');
+            await interaction.reply('This user is currently not listening to music.');
         }
     }
 };

@@ -15,7 +15,6 @@ export default {
     aliases: ['ui'],
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
-        await interaction.deferReply({ flags: ephemeral ? MessageFlags.Ephemeral : undefined });
 
         const user = interaction.options.getUser('user') || interaction.user;
         const member = interaction.guild?.members.cache.get(user.id);
@@ -49,6 +48,6 @@ export default {
             }
         }
 
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed], flags: ephemeral ? MessageFlags.Ephemeral : undefined });
     }
 };

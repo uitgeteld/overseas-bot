@@ -9,6 +9,7 @@ export default {
                 .setDescription('GitHub user or repository (username or owner/repo or URL)')
                 .setRequired(false)),
     async execute(interaction: ChatInputCommandInteraction) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         try {
             let repo = interaction.options.getString('repo');
             let match;

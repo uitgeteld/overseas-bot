@@ -5,6 +5,5 @@ export default {
         .setDescription('Development command for testing purposes'),
     dev: true,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
-        await interaction.deferReply();
     }
 };

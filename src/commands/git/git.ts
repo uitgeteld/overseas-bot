@@ -11,6 +11,7 @@ export default {
                 .setDescription('GitHub username or repository (username or owner/repo or URL)')
                 .setRequired(false)),
     async execute(interaction: ChatInputCommandInteraction) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         try {
             let repo = interaction.options.getString('repo');
             let commits;
