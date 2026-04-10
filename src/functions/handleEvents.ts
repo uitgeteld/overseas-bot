@@ -7,6 +7,7 @@ import { loadModule } from "../helpers/loadModule";
 const folderColors: Record<string, (text: string) => string> = {
   guildMember: chalk.cyan,
   git: chalk.magenta,
+  trello: chalk.blue,
   default: chalk.white
 };
 

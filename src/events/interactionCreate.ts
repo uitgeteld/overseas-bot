@@ -1,11 +1,23 @@
 import { Interaction, Client, MessageFlags } from "discord.js";
+import { query } from "../utils/database";
 
 export default {
   name: "interactionCreate",
   once: false,
   async execute(interaction: Interaction, client: Client) {
     if (!interaction.isCommand()) return;
+
+    try {
+      const existingUser = await query("SELECT id FROM users WHERE id = ?", [interaction.user.id]);
+      if (existingUser.length === 0) {
+        await query("INSERT INTO users (id) VALUES (?)", [interaction.user.id]);
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+
     const command = client.commands.get(interaction.commandName);
+    
     if (command) {
       try {
         if (command.dev) {
@@ -22,6 +34,7 @@ export default {
             content: 'This command can only be used in a server.'
           });
         }
+
         await command.execute(interaction, client);
       } catch (error) {
         console.error(error);
