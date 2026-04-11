@@ -46,9 +46,16 @@ async function darkenImageColorToHex(rgbString: string): Promise<string> {
     return `${darkenedHexColor}`;
 }
 
-function isPlayingSpotify(presence: any): any {
+function isPlayingMusic(presence: any): any {
     if (!presence || !presence.activities) return null;
-    return presence.activities.find((activity: any) => activity.type === 2 && activity.name === 'Spotify');
+    const musicProviders = ['spotify', 'apple music', 'soundcloud'];
+
+    return presence.activities.find((activity: any) => {
+        if (activity.type !== 2) return false;
+        if (!activity.name) return false;
+        const name = String(activity.name).toLowerCase();
+        return musicProviders.some(provider => name.includes(provider));
+    }) || null;
 }
 
-export { darkenRGBColor, rgbToHex, parseRGB, darkenImageColorToHex, isPlayingSpotify };
+export { darkenRGBColor, rgbToHex, parseRGB, darkenImageColorToHex, isPlayingMusic };
