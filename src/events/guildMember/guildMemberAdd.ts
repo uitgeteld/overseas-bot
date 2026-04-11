@@ -1,5 +1,5 @@
 import { GuildMember, Client, EmbedBuilder } from "discord.js";
-import { query } from "../../utils/database";
+import { query } from "../../utils/database/database";
 
 export default {
     name: "guildMemberAdd",

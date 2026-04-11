@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, PermissionFlagsBits, EmbedBuilder, MessageFlags } from "discord.js";
-import { query, insert, update, remove } from "../../utils/database";
+import { query, insert, update, remove } from "../../utils/database/database";
 
 export default {
     data: new SlashCommandBuilder()

@@ -1,5 +1,5 @@
 import { Interaction, Client, MessageFlags } from "discord.js";
-import { query } from "../utils/database";
+import { query } from "../utils/database/database";
 
 export default {
   name: "interactionCreate",

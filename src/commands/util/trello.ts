@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
-import { status, query } from '../../utils/database';
+import { status, query } from '../../utils/database/database';
 export default {
     data: new SlashCommandBuilder()
         .setName('trello')
