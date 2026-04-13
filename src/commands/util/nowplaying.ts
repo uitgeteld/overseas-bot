@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client, AttachmentBuilder } from "discord.js";
-import { isPlayingSpotify } from '../../utils/spotifyPresence';
+import { isPlayingMusic } from '../../utils/musicPresence';
 import { MusicCard } from '../../functions/image/index'
 
 export default {
@@ -22,27 +22,31 @@ export default {
 
         if (!presence) return await interaction.reply('This user is currently not in a server where I am present.');
 
-        if (isPlayingSpotify(presence)) {
-            const spotifyActivity = isPlayingSpotify(presence);
+        if (isPlayingMusic(presence)) {
+            const musicActivity = isPlayingMusic(presence);
+            if (musicActivity.state == null) return await interaction.reply('This user is currently not listening to music.');
+            const musicPlatform = musicActivity.name;
 
-            if (spotifyActivity.state == null) return await interaction.reply('This user is currently not listening to music.');
+            switch (musicPlatform) {
+                case 'spotify':
+                    const songStartTime = musicActivity.timestamps?.start;
+                    const songEndTime = musicActivity.timestamps?.end;
+                    const songDuration = (songEndTime - songStartTime) / 1000;
+                    const elapsedTime = ((Date.now() - songStartTime) / 1000) < 0 ? 0 : (Date.now() - songStartTime) / 1000;
 
-            const songStartTime = spotifyActivity.timestamps?.start;
-            const songEndTime = spotifyActivity.timestamps?.end;
-            const songDuration = (songEndTime - songStartTime) / 1000;
-            const elapsedTime = ((Date.now() - songStartTime) / 1000) < 0 ? 0 : (Date.now() - songStartTime) / 1000;
+                    const card = await new MusicCard()
+                        .setSong(musicActivity.details)
+                        .setArtist(musicActivity.state)
+                        .setAlbum(musicActivity.assets.largeText)
+                        .setCover(`https://i.scdn.co/image/${musicActivity.assets.largeImage.slice(8)}`)
+                        .setTime(elapsedTime, songDuration)
+                        .build()
 
-            const card = await new MusicCard()
-                .setSong(spotifyActivity.details)
-                .setArtist(spotifyActivity.state)
-                .setAlbum(spotifyActivity.assets.largeText)
-                .setCover(`https://i.scdn.co/image/${spotifyActivity.assets.largeImage.slice(8)}`)
-                .setTime(elapsedTime, songDuration)
-                .build()
+                    const attachment = new AttachmentBuilder(card!, { name: 'musicCard.png' });
 
-            const attachment = new AttachmentBuilder(card!, { name: 'musicCard.png' });
-
-            interaction.reply({ files: [attachment] });
+                    interaction.reply({ files: [attachment] });
+                    break;
+            }
         } else {
             await interaction.reply('This user is currently not listening to music.');
         }
