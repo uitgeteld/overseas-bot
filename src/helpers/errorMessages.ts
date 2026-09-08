@@ -17,6 +17,7 @@ export const errorMessages = {
             BOT_NOT_IN_VOICE_CHANNEL: `✗ **Error:** The bot is not in a voice channel."`,
             BOT_ALREADY_IN_VOICE_CHANNEL: `✗ **Error:** The bot is already in a voice channel."`,
             VOICE_CONNECTION_FAILED: `✗ **Error:** Failed to connect to the voice channel."`,
+            UNSUPPORTED_FILE_TYPE: `✗ **Error:** The provided audio file type is not supported. Supported types are: mp3, wav, ogg, flac."`,
         }
     }
 }

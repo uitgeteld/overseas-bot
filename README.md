@@ -54,13 +54,12 @@ Runs with `tsx watch`, restarts automatically when you edit files.
 
 Stuff I'm planning to add or fix:
 
-- Music
+- Adding url function to play command
 - Moderation
 
-Currently working on: 
+## Changelog
 
-- Voice
-- Adding more error messages
+- Added play command (files only for now)
 
 ## License
 
