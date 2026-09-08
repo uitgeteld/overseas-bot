@@ -3,10 +3,6 @@ interface Categories {
 }
 
 const categories: Categories = {
-    git: ' 🐈‍⬛ Git',
-    image: '🖼️ Image',
-    moderation: '🛡️ Moderation',
-    settings: '⚙️ Settings',
     util: '🔧 Utility',
 };
 

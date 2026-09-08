@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, Client, MessageFlags, EmbedBuilder } from "discord.js";
-import { categorizer } from "../../helpers/categorizer";
 import fs from "node:fs";
 import path from "node:path";
+import { categorizer } from "../../helpers/categorizer";
 
 export default {
     data: new SlashCommandBuilder()
@@ -10,7 +10,9 @@ export default {
         .addStringOption(option =>
             option.setName('command')
                 .setDescription('The command to get help for')
-                .setRequired(false)),
+                .setRequired(false))
+    ,
+    guild: false,
     async execute(interaction: ChatInputCommandInteraction, client: Client) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -20,12 +22,8 @@ export default {
             const command = client.commands.get(commandName);
 
             if (!command) {
-                    return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
-                }
-
-                if (command.guild && !interaction.guild) {
-                    return await interaction.reply({ content: `The command "/${commandName}" is only available in servers.`, flags: MessageFlags.Ephemeral });
-                }
+                return await interaction.reply({ content: `No command found with name "${commandName}".`, flags: MessageFlags.Ephemeral });
+            }
 
             const embed = new EmbedBuilder()
                 .setColor('#C9C2B2')
@@ -69,7 +67,7 @@ export default {
                 })
                 .map(cmd => `\`/${cmd.data.name}\``)
                 .join(', ') || false;
-                
+
             if (commandList) {
                 embed.addFields({ name: category, value: commandList });
             }

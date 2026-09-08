@@ -1,65 +1,32 @@
 import { Client, GatewayIntentBits } from "discord.js";
+import path from "node:path";
 import { config } from "./config";
-import path from "path";
 import handleCommands from "./functions/handleCommands";
 import handleEvents from "./functions/handleEvents";
-import { execSync } from "child_process";
-import { instance as initializeDatabase } from "./utils/database/database";
+import { instance as initializeDatabase } from "./database/main";
+import { errorMessages } from "./helpers/errorMessages";
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildPresences
+        GatewayIntentBits.DirectMessages,
     ],
 }) as Client;
 
 const commandsPath = path.join(__dirname, "./commands");
 const eventsPath = path.join(__dirname, "./events");
 
-const startTime = Date.now();
-
-try {
-    console.log('Checking for updates...');
-    execSync('git fetch origin main', { stdio: 'pipe' });
-
-    const changes = execSync('git log HEAD..origin/main --oneline', { encoding: 'utf-8' });
-
-    if (changes.trim()) {
-        console.log('\nNew commits found:');
-        console.log(changes);
-
-        const diffStat = execSync('git diff --stat HEAD..origin/main', { encoding: 'utf-8' });
-        console.log('Files changed:');
-        console.log(diffStat);
-
-        try {
-            console.log('Pulling latest changes from GitHub...');
-            execSync('git pull origin main', { stdio: 'inherit' });
-            console.log('Successfully updated from GitHub!\n');
-        } catch (error) {
-            console.log(`Could not pull from GitHub ${error}\n`);
-            console.log('Continuing with existing files...\n');
-        }
-    } else {
-        console.log('No updates available.\n');
-    }
-} catch (error) {
-    console.log(`Could not check for updates ${error}\n`);
-}
-
-const setupTime = ((Date.now() - startTime) / 1000).toFixed(1);
-console.log(`Setup completed in ${setupTime}s\n\n`);
-
 (async () => {
+    await handleCommands(client, commandsPath);
+    await handleEvents(client, eventsPath);
     try {
         await initializeDatabase();
     } catch {
-        console.log('Failed to initialize database. Continuing without database connection.');
+        console.log(errorMessages.console.DATABASE_CONNECTION);
     }
-    await handleCommands(client, commandsPath);
-    await handleEvents(client, eventsPath);
     client.login(config.TOKEN);
 })();

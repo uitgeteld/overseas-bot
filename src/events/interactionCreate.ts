@@ -1,5 +1,5 @@
 import { Interaction, Client, MessageFlags } from "discord.js";
-import { query } from "../utils/database/database";
+import { errorMessages } from "../helpers/errorMessages";
 
 export default {
   name: "interactionCreate",
@@ -7,17 +7,8 @@ export default {
   async execute(interaction: Interaction, client: Client) {
     if (!interaction.isCommand()) return;
 
-    try {
-      const existingUser = await query("SELECT id FROM users WHERE id = ?", [interaction.user.id]);
-      if (existingUser.length === 0) {
-        await query("INSERT INTO users (id) VALUES (?)", [interaction.user.id]);
-      }
-    } catch (error) {
-      console.error("Error creating user:", error);
-    }
-
     const command = client.commands.get(interaction.commandName);
-    
+
     if (command) {
       try {
         if (command.dev) {
@@ -31,7 +22,7 @@ export default {
           }
         } else if (command.guild && !interaction.guild) {
           return await interaction.reply({
-            content: 'This command can only be used in a server.'
+            content: `${errorMessages.messages.GUILD_ONLY}`,
           });
         }
 

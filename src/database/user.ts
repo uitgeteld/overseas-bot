@@ -1,4 +1,4 @@
-import { query, insert } from "./database";
+import { query, insert } from "./main";
 
 export async function createUser(userId: string, ): Promise<void | Error> {
     try {

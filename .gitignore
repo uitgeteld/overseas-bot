@@ -4,3 +4,8 @@ dist/
 package-lock.json
 startOptions.json
 options.json
+src/commands/hidden
+src/events/hidden
+src/functions/hidden
+src/helpers/hidden
+src/utils/hidden
