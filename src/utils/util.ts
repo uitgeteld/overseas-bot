@@ -34,6 +34,26 @@ export class Util {
     }
 
     /**
+     * Formats seconds into a `minutes:seconds` string
+     * @param totalSeconds - The total seconds to format
+     * @returns Formatted time string
+     */
+    static formatMinutesSeconds(totalSeconds: number | null): string {
+        const minutes = Math.floor((totalSeconds ? totalSeconds : 0) / 60);
+        const seconds = Math.floor((totalSeconds ? totalSeconds : 0) % 60);
+        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    /**
+     * Removes the file extension from a filename
+     * @param filename - The filename to process
+     * @returns The filename without its extension
+     */
+    static removeExtension(filename: string): string {
+        return filename.replace(/\.[^.]+$/, "");
+    }
+
+    /**
      * Formats variable names by converting kebab-case to camelCase
      * @param prefix - The prefix to add to the variable
      * @param variable - The variable name to format

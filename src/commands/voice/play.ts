@@ -1,22 +1,7 @@
-import {
-    ChatInputCommandInteraction,
-    SlashCommandBuilder,
-    Client,
-    MessageFlags,
-    GuildMember,
-    EmbedBuilder,
-} from "discord.js";
-import {
-    getVoiceConnection,
-    createAudioPlayer,
-    createAudioResource,
-    NoSubscriberBehavior,
-    StreamType,
-    joinVoiceChannel,
-    entersState,
-    VoiceConnectionStatus,
-} from "@discordjs/voice";
+import { ChatInputCommandInteraction, SlashCommandBuilder, Client, MessageFlags, GuildMember, EmbedBuilder, } from "discord.js";
+import { getVoiceConnection, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, joinVoiceChannel, entersState, VoiceConnectionStatus, } from "@discordjs/voice";
 import { errorMessages } from "../../helpers/errorMessages";
+import { Util } from "../../utils/util";
 
 export default {
     data: new SlashCommandBuilder()
@@ -90,15 +75,16 @@ export default {
             console.error("Audio player error:", error);
         });
 
+
         const embed = new EmbedBuilder()
             .setColor("#C9C2B2")
-            .setTitle("Now Playing")
-            .setDescription(`Playing: ${attachment.name}`)
-            .setFooter({
-                text: `Uploaded audio file by ${interaction.user.username}`,
-                iconURL: interaction.user.displayAvatarURL(),
-            });
+            .setTitle(`${Util.removeExtension(attachment.name || "Unknown File")}`)
+            .addFields(
+                { name: "Duration", value: `${Util.formatMinutesSeconds(attachment.duration)}`, inline: true },
+                { name: "Uploader", value: `${interaction.user.username}`, inline: true }
+            );
 
+        console.log(attachment)
         await interaction.editReply({ embeds: [embed] });
     },
 };

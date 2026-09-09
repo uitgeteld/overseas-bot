@@ -2,11 +2,7 @@
   "name": "overseas-bot",
   "version": "1.0.0",
   "description": "overseas is just a fun discord bot",
-  "keywords": [
-    "overseas",
-    "discord",
-    "bot"
-  ],
+  "keywords": [ "overseas", "discord", "bot"],
   "homepage": "https://github.com/uitgeteld/overseas-bot#readme",
   "bugs": {
     "url": "https://github.com/uitgeteld/overseas-bot/issues"
