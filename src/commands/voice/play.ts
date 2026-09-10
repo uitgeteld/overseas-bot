@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, Client, MessageFlags, GuildMember, EmbedBuilder, } from "discord.js";
 import { getVoiceConnection, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, joinVoiceChannel, entersState, VoiceConnectionStatus, } from "@discordjs/voice";
+import { Readable } from "node:stream";
 import { errorMessages } from "../../helpers/errorMessages";
 import { Util } from "../../utils/util";
 
@@ -64,17 +65,30 @@ export default {
             behaviors: { noSubscriber: NoSubscriberBehavior.Pause },
         });
 
-        const resource = createAudioResource(attachment.url, {
-            inputType: StreamType.Arbitrary,
-        });
-
-        connection.subscribe(player);
-        player.play(resource);
-
         player.on("error", (error) => {
             console.error("Audio player error:", error);
         });
 
+        connection.subscribe(player);
+
+        try {
+            const response = await fetch(attachment.url);
+            if (!response.ok || !response.body) {
+                throw new Error(`Failed to fetch attachment: ${response.status}`);
+            }
+            const stream = Readable.fromWeb(response.body as any);
+
+            const resource = createAudioResource(stream, {
+                inputType: StreamType.Arbitrary,
+            });
+
+            player.play(resource);
+        } catch (error) {
+            console.error("Failed to create/play audio resource:", error);
+            return interaction.editReply({
+                content: errorMessages.messages.voice.VOICE_CONNECTION_FAILED,
+            });
+        }
 
         const embed = new EmbedBuilder()
             .setColor("#C9C2B2")
@@ -84,7 +98,6 @@ export default {
                 { name: "Uploader", value: `${interaction.user.username}`, inline: true }
             );
 
-        console.log(attachment)
         await interaction.editReply({ embeds: [embed] });
     },
 };
